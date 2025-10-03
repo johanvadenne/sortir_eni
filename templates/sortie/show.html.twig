@@ -1,0 +1,218 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ sortie.nom }}{% endblock %}
+
+{% block main_class %}py-4{% endblock %}
+
+{% block body %}
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            {% if not sortie.urlPhoto %}
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h1><i class="bi bi-calendar-event"></i> {{ sortie.nom }}</h1>
+                    <span class="badge bg-{{
+                        sortie.etat.libelle == 'Créée' ? 'secondary' :
+                        sortie.etat.libelle == 'Ouverte' ? 'success' :
+                        sortie.etat.libelle == 'Clôturée' ? 'warning' :
+                        sortie.etat.libelle == 'Activité en cours' ? 'primary' :
+                        sortie.etat.libelle == 'Activité terminée' ? 'info' :
+                        sortie.etat.libelle == 'Annulée' ? 'danger' :
+                        'dark'
+                    }} fs-6">
+                        {{ sortie.etat.libelle }}
+                    </span>
+                </div>
+            {% endif %}
+
+            <div class="row">
+                <div class="col-md-8">
+                    {% if sortie.urlPhoto %}
+                        <div class="card shadow mb-4">
+                            <div class="card-image-detail"
+                                 style="height: 300px; background-image: url('{{ sortie.urlPhoto }}'); background-size: cover; background-position: center; background-repeat: no-repeat; position: relative; border-radius: 0.375rem 0.375rem 0 0;">
+                                <div class="card-image-overlay" style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(to bottom, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.5) 100%); border-radius: 0.375rem 0.375rem 0 0;"></div>
+                                <div class="position-absolute top-0 start-0 p-3">
+                                    <h2 class="text-white mb-0" style="text-shadow: 2px 2px 4px rgba(0,0,0,0.8);">{{ sortie.nom }}</h2>
+                                </div>
+                                <div class="position-absolute top-0 end-0 p-3">
+                                    <span class="badge bg-{{
+                                        sortie.etat.libelle == 'Créée' ? 'secondary' :
+                                        sortie.etat.libelle == 'Ouverte' ? 'success' :
+                                        sortie.etat.libelle == 'Clôturée' ? 'warning' :
+                                        sortie.etat.libelle == 'Activité en cours' ? 'primary' :
+                                        sortie.etat.libelle == 'Activité terminée' ? 'info' :
+                                        sortie.etat.libelle == 'Annulée' ? 'danger' :
+                                        'dark'
+                                    }} fs-6" style="text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">
+                                        {{ sortie.etat.libelle }}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+
+                    <div class="card shadow">
+                        <div class="card-header bg-primary text-white">
+                            <h3 class="mb-0"><i class="bi bi-info-circle"></i> Détails de la sortie</h3>
+                        </div>
+                        <div class="card-body sortie-details">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <i class="bi bi-calendar-date text-primary"></i>
+                                        <strong>Date de début:</strong> {{ sortie.dateHeureDebut|date('d/m/Y H:i') }}
+                                    </div>
+                                    <div class="mb-3">
+                                        <i class="bi bi-clock text-primary"></i>
+                                        <strong>Durée:</strong> {{ sortie.duree ? sortie.duree ~ ' minutes' : 'Non définie' }}
+                                    </div>
+                                    <div class="mb-3">
+                                        <i class="bi bi-calendar-check text-primary"></i>
+                                        <strong>Date limite inscription:</strong> {{ sortie.dateLimiteInscription|date('d/m/Y H:i') }}
+                                    </div>
+                                    <div class="mb-3">
+                                        <i class="bi bi-people text-primary"></i>
+                                        <strong>Nombre max d'inscriptions:</strong> {{ sortie.nbInscriptionsMax }}
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <i class="bi bi-geo-alt text-primary"></i>
+                                        <strong>Lieu:</strong> {{ sortie.lieu.nom }}
+                                    </div>
+                                    <div class="mb-3">
+                                        <i class="bi bi-geo text-primary"></i>
+                                        <strong>Adresse:</strong> {{ sortie.lieu.rue ?: 'Non renseignée' }}
+                                    </div>
+                                    <div class="mb-3">
+                                        <i class="bi bi-building text-primary"></i>
+                                        <strong>Ville:</strong> {{ sortie.lieu.ville.nom }} ({{ sortie.lieu.ville.codePostal }})
+                                    </div>
+                                    <div class="mb-3 d-flex align-items-center">
+                                        <i class="bi bi-person text-primary me-2"></i>
+                                        <strong>Organisateur:</strong>
+                                        {% if sortie.organisateur.photoProfil %}
+                                            <img src="{{ sortie.organisateur.photoProfil }}" alt="Photo de {{ sortie.organisateur.pseudo }}" class="rounded-circle ms-2 me-2" style="width: 24px; height: 24px; object-fit: cover;">
+                                        {% else %}
+                                            <div class="rounded-circle ms-2 me-2 d-flex align-items-center justify-content-center bg-primary text-white" style="width: 24px; height: 24px; font-size: 12px; font-weight: bold;">
+                                                {{ sortie.organisateur.prenom|first|upper }}{{ sortie.organisateur.nom|first|upper }}
+                                            </div>
+                                        {% endif %}
+                                        <span>{{ sortie.organisateur.pseudo }}</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {% if sortie.infosSortie %}
+                                <div class="mt-3">
+                                    <h5>Informations complémentaires</h5>
+                                    <p>{{ sortie.infosSortie }}</p>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="card shadow">
+                        <div class="card-header bg-secondary text-white">
+                            <h4 class="mb-0"><i class="bi bi-gear"></i> Actions</h4>
+                        </div>
+                        <div class="card-body actions-mobile">
+                            <div class="d-grid gap-2">
+                                {% if can_publish %}
+                                    <form method="post" action="{{ path('sortie_publier', {id: sortie.id}) }}">
+                                        <button type="submit" class="btn btn-success w-100">
+                                            <i class="bi bi-check-circle"></i> Publier la sortie
+                                        </button>
+                                    </form>
+                                {% endif %}
+
+                                {% if can_edit %}
+                                    <a href="{{ path('sortie_edit', {id: sortie.id}) }}" class="btn btn-warning w-100">
+                                        <i class="bi bi-pencil"></i> Modifier
+                                    </a>
+                                {% endif %}
+
+                                {% if can_cancel %}
+                                    <form method="post" action="{{ path('sortie_annuler', {id: sortie.id}) }}">
+                                        <button type="submit" class="btn btn-danger w-100" onclick="return confirm('Êtes-vous sûr de vouloir annuler cette sortie ?')">
+                                            <i class="bi bi-x-circle"></i> Annuler la sortie
+                                        </button>
+                                    </form>
+                                {% endif %}
+
+                                {% if can_delete %}
+                                    <form method="post" action="{{ path('sortie_supprimer', {id: sortie.id}) }}">
+                                        <button type="submit" class="btn btn-outline-danger w-100" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette sortie ?')">
+                                            <i class="bi bi-trash"></i> Supprimer
+                                        </button>
+                                    </form>
+                                {% endif %}
+
+                                {% if app.user and sortie.etat.libelle == 'Ouverte' %}
+                                    {% if is_inscrit %}
+                                        <form method="post" action="{{ path('sortie_desistement', {id: sortie.id}) }}">
+                                            <button type="submit" class="btn btn-outline-warning w-100">
+                                                <i class="bi bi-x-circle"></i> Se désinscrire
+                                            </button>
+                                        </form>
+                                    {% else %}
+                                        <form method="post" action="{{ path('sortie_inscription', {id: sortie.id}) }}">
+                                            <button type="submit" class="btn btn-primary w-100">
+                                                <i class="bi bi-check-circle"></i> S'inscrire
+                                            </button>
+                                        </form>
+                                    {% endif %}
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card shadow mt-3">
+                        <div class="card-header bg-info text-white">
+                            <h4 class="mb-0">
+                                <i class="bi bi-people"></i> Participants inscrits ({{ participants_inscrits|length }}/{{ sortie.nbInscriptionsMax }})
+                            </h4>
+                        </div>
+                        <div class="card-body">
+                            {% if participants_inscrits is empty %}
+                                <p class="text-muted text-center">
+                                    <i class="bi bi-person-x"></i> Aucun participant inscrit
+                                </p>
+                            {% else %}
+                                <div class="list-group list-group-flush">
+                                    {% for participant in participants_inscrits %}
+                                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                                            <div class="d-flex align-items-center">
+                                                {% if participant.photoProfil %}
+                                                    <img src="{{ participant.photoProfil }}" alt="Photo de {{ participant.pseudo }}" class="rounded-circle me-2" style="width: 32px; height: 32px; object-fit: cover;">
+                                                {% else %}
+                                                    <div class="rounded-circle me-2 d-flex align-items-center justify-content-center bg-primary text-white" style="width: 32px; height: 32px; font-size: 14px; font-weight: bold;">
+                                                        {{ participant.prenom|first|upper }}{{ participant.nom|first|upper }}
+                                                    </div>
+                                                {% endif %}
+                                                <span>{{ participant.pseudo }}</span>
+                                            </div>
+                                            {% if participant.administrateur %}
+                                                <span class="badge bg-danger">Admin</span>
+                                            {% endif %}
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-4">
+                <a href="{{ path('home') }}" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left"></i> Retour à la liste
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

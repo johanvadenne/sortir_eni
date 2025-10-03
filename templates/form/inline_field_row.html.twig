@@ -1,0 +1,7 @@
+{# Template pour les champs de formulaire en ligne #}
+<div class="col-md-6 mb-3">
+    {{ form_label(form, null, {'label_attr': {'class': 'form-label fw-bold'}}) }}
+    {{ form_widget(form, {'attr': {'class': 'form-control'}}) }}
+    {{ form_help(form) }}
+    {{ form_errors(form) }}
+</div>

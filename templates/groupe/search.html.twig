@@ -1,0 +1,139 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Rechercher des groupes{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="h3 mb-0">
+                    <i class="fas fa-search me-2"></i>Rechercher des groupes
+                </h1>
+                <div>
+                    <a href="{{ path('groupe_index') }}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-1"></i>Mes groupes
+                    </a>
+                </div>
+            </div>
+
+            <!-- Formulaire de recherche -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <form method="get" action="{{ path('groupe_search') }}">
+                        <div class="row">
+                            <div class="col-md-10">
+                                <input type="text" name="q" class="form-control form-control-lg"
+                                       placeholder="Rechercher un groupe par nom..."
+                                       value="{{ searchTerm }}">
+                            </div>
+                            <div class="col-md-2">
+                                <button type="submit" class="btn btn-primary btn-lg w-100">
+                                    <i class="fas fa-search me-1"></i>Rechercher
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Résultats -->
+            {% if searchTerm %}
+                <div class="mb-3">
+                    <h5>
+                        {% if groupes is empty %}
+                            Aucun résultat pour "{{ searchTerm }}"
+                        {% else %}
+                            {{ groupes|length }} résultat(s) pour "{{ searchTerm }}"
+                        {% endif %}
+                    </h5>
+                </div>
+            {% endif %}
+
+            {% if groupes is empty and searchTerm %}
+                <div class="alert alert-info text-center">
+                    <i class="fas fa-info-circle fa-2x mb-3"></i>
+                    <h4>Aucun groupe trouvé</h4>
+                    <p class="mb-3">Aucun groupe ne correspond à votre recherche "{{ searchTerm }}".</p>
+                    <div>
+                        <a href="{{ path('groupe_new') }}" class="btn btn-primary me-2">
+                            <i class="fas fa-plus me-1"></i>Créer ce groupe
+                        </a>
+                        <a href="{{ path('groupe_search') }}" class="btn btn-outline-secondary">
+                            <i class="fas fa-search me-1"></i>Nouvelle recherche
+                        </a>
+                    </div>
+                </div>
+            {% elseif groupes is not empty %}
+                <div class="row">
+                    {% for groupe in groupes %}
+                        <div class="col-md-6 col-lg-4 mb-4">
+                            <div class="card h-100 shadow-sm">
+                                <div class="card-header bg-primary text-white">
+                                    <h5 class="card-title mb-0">
+                                        <i class="fas fa-users me-2"></i>{{ groupe.nom }}
+                                    </h5>
+                                </div>
+                                <div class="card-body d-flex flex-column">
+                                    {% if groupe.description %}
+                                        <p class="card-text text-muted mb-3">{{ groupe.description|slice(0, 100) }}{% if groupe.description|length > 100 %}...{% endif %}</p>
+                                    {% endif %}
+
+                                    <div class="row text-center mb-3">
+                                        <div class="col-6">
+                                            <div class="border-end">
+                                                <strong class="text-primary">{{ groupe.nbParticipants }}</strong>
+                                                <br>
+                                                <small class="text-muted">Membres</small>
+                                            </div>
+                                        </div>
+                                        <div class="col-6">
+                                            <strong class="text-success">{{ groupe.nbSorties }}</strong>
+                                            <br>
+                                            <small class="text-muted">Sorties</small>
+                                        </div>
+                                    </div>
+
+                                    <div class="mt-auto">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <small class="text-muted">
+                                                <i class="fas fa-user me-1"></i>Créé par {{ groupe.createur.prenom }} {{ groupe.createur.nom }}
+                                            </small>
+                                            <small class="text-muted">
+                                                <i class="fas fa-calendar me-1"></i>{{ groupe.dateCreation|date('d/m/Y') }}
+                                            </small>
+                                        </div>
+
+                                        <div class="d-grid gap-2">
+                                            <a href="{{ path('groupe_show', {'id': groupe.id}) }}" class="btn btn-outline-primary btn-sm">
+                                                <i class="fas fa-eye me-1"></i>Voir le groupe
+                                            </a>
+
+                                            {% if groupe.isMembre(user) %}
+                                                <span class="badge bg-success w-100">Vous êtes membre</span>
+                                            {% else %}
+                                                <a href="{{ path('groupe_membres', {'id': groupe.id}) }}" class="btn btn-primary btn-sm">
+                                                    <i class="fas fa-user-plus me-1"></i>Rejoindre
+                                                </a>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="alert alert-info text-center">
+                    <i class="fas fa-search fa-2x mb-3"></i>
+                    <h4>Rechercher des groupes</h4>
+                    <p class="mb-3">Utilisez le formulaire ci-dessus pour rechercher des groupes par nom.</p>
+                    <a href="{{ path('groupe_new') }}" class="btn btn-primary">
+                        <i class="fas fa-plus me-1"></i>Créer un nouveau groupe
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

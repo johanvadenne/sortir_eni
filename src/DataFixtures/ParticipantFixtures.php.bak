@@ -1,0 +1,235 @@
+<?php
+
+namespace App\DataFixtures;
+
+use App\Entity\Participant;
+use App\Entity\Site;
+use Doctrine\Bundle\FixturesBundle\Fixture;
+use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
+use Doctrine\Persistence\ObjectManager;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+
+class ParticipantFixtures extends Fixture implements FixtureGroupInterface
+{
+    public function __construct(
+        private UserPasswordHasherInterface $passwordHasher
+    ) {
+    }
+
+    public function load(ObjectManager $manager): void
+    {
+        $participants = [
+            // Admin
+            [
+                'pseudo' => 'admin',
+                'nom' => 'Administrateur',
+                'prenom' => 'Admin',
+                'telephone' => '06 12 34 56 78',
+                'email' => 'admin@eni.fr',
+                'site' => 'eni_nantes',
+                'administrateur' => true,
+                'actif' => true,
+                'password' => 'admin123'
+            ],
+            // Utilisateurs ENI Nantes
+            [
+                'pseudo' => 'jean.dupont',
+                'nom' => 'Dupont',
+                'prenom' => 'Jean',
+                'telephone' => '06 11 22 33 44',
+                'email' => 'jean.dupont@eni.fr',
+                'site' => 'eni_nantes',
+                'administrateur' => false,
+                'actif' => true,
+                'password' => 'password123'
+            ],
+            [
+                'pseudo' => 'marie.martin',
+                'nom' => 'Martin',
+                'prenom' => 'Marie',
+                'telephone' => '06 22 33 44 55',
+                'email' => 'marie.martin@eni.fr',
+                'site' => 'eni_nantes',
+                'administrateur' => false,
+                'actif' => true,
+                'password' => 'password123'
+            ],
+            [
+                'pseudo' => 'pierre.bernard',
+                'nom' => 'Bernard',
+                'prenom' => 'Pierre',
+                'telephone' => '06 33 44 55 66',
+                'email' => 'pierre.bernard@eni.fr',
+                'site' => 'eni_nantes',
+                'administrateur' => false,
+                'actif' => true,
+                'password' => 'password123'
+            ],
+            // Utilisateurs ENI Rennes
+            [
+                'pseudo' => 'sophie.leroy',
+                'nom' => 'Leroy',
+                'prenom' => 'Sophie',
+                'telephone' => '06 44 55 66 77',
+                'email' => 'sophie.leroy@eni.fr',
+                'site' => 'eni_rennes',
+                'administrateur' => false,
+                'actif' => true,
+                'password' => 'password123'
+            ],
+            [
+                'pseudo' => 'thomas.petit',
+                'nom' => 'Petit',
+                'prenom' => 'Thomas',
+                'telephone' => '06 55 66 77 88',
+                'email' => 'thomas.petit@eni.fr',
+                'site' => 'eni_rennes',
+                'administrateur' => false,
+                'actif' => true,
+                'password' => 'password123'
+            ],
+            // Utilisateurs ENI Angers
+            [
+                'pseudo' => 'laura.durand',
+                'nom' => 'Durand',
+                'prenom' => 'Laura',
+                'telephone' => '06 66 77 88 99',
+                'email' => 'laura.durand@eni.fr',
+                'site' => 'eni_angers',
+                'administrateur' => false,
+                'actif' => true,
+                'password' => 'password123'
+            ],
+            [
+                'pseudo' => 'alexandre.moreau',
+                'nom' => 'Moreau',
+                'prenom' => 'Alexandre',
+                'telephone' => '06 77 88 99 00',
+                'email' => 'alexandre.moreau@eni.fr',
+                'site' => 'eni_angers',
+                'administrateur' => false,
+                'actif' => true,
+                'password' => 'password123'
+            ],
+            // Utilisateurs ENI Le Mans
+            [
+                'pseudo' => 'camille.simon',
+                'nom' => 'Simon',
+                'prenom' => 'Camille',
+                'telephone' => '06 88 99 00 11',
+                'email' => 'camille.simon@eni.fr',
+                'site' => 'eni_le_mans',
+                'administrateur' => false,
+                'actif' => true,
+                'password' => 'password123'
+            ],
+            [
+                'pseudo' => 'nicolas.laurent',
+                'nom' => 'Laurent',
+                'prenom' => 'Nicolas',
+                'telephone' => '06 99 00 11 22',
+                'email' => 'nicolas.laurent@eni.fr',
+                'site' => 'eni_le_mans',
+                'administrateur' => false,
+                'actif' => true,
+                'password' => 'password123'
+            ],
+            // Utilisateurs ENI Tours
+            [
+                'pseudo' => 'julie.lefebvre',
+                'nom' => 'Lefebvre',
+                'prenom' => 'Julie',
+                'telephone' => '06 00 11 22 33',
+                'email' => 'julie.lefebvre@eni.fr',
+                'site' => 'eni_tours',
+                'administrateur' => false,
+                'actif' => true,
+                'password' => 'password123'
+            ],
+            [
+                'pseudo' => 'antoine.michel',
+                'nom' => 'Michel',
+                'prenom' => 'Antoine',
+                'telephone' => '06 01 12 23 34',
+                'email' => 'antoine.michel@eni.fr',
+                'site' => 'eni_tours',
+                'administrateur' => false,
+                'actif' => true,
+                'password' => 'password123'
+            ],
+            // Utilisateurs ENI Orléans
+            [
+                'pseudo' => 'emma.garcia',
+                'nom' => 'Garcia',
+                'prenom' => 'Emma',
+                'telephone' => '06 02 13 24 35',
+                'email' => 'emma.garcia@eni.fr',
+                'site' => 'eni_orleans',
+                'administrateur' => false,
+                'actif' => true,
+                'password' => 'password123'
+            ],
+            [
+                'pseudo' => 'quentin.david',
+                'nom' => 'David',
+                'prenom' => 'Quentin',
+                'telephone' => '06 03 14 25 36',
+                'email' => 'quentin.david@eni.fr',
+                'site' => 'eni_orleans',
+                'administrateur' => false,
+                'actif' => true,
+                'password' => 'password123'
+            ],
+            // Utilisateurs inactifs
+            [
+                'pseudo' => 'inactif.user',
+                'nom' => 'Inactif',
+                'prenom' => 'User',
+                'telephone' => '06 04 15 26 37',
+                'email' => 'inactif@eni.fr',
+                'site' => 'eni_nantes',
+                'administrateur' => false,
+                'actif' => false,
+                'password' => 'password123'
+            ]
+        ];
+
+        foreach ($participants as $participantData) {
+            $participant = new Participant();
+            $participant->setPseudo($participantData['pseudo']);
+            $participant->setNom($participantData['nom']);
+            $participant->setPrenom($participantData['prenom']);
+            $participant->setTelephone($participantData['telephone']);
+            $participant->setEmail($participantData['email']);
+            $participant->setAdministrateur($participantData['administrateur']);
+            $participant->setActif($participantData['actif']);
+
+            // Récupérer le site par référence
+            $site = $this->getReference('site_' . $participantData['site'], \App\Entity\Site::class);
+            $participant->setSite($site);
+
+            // Hasher le mot de passe
+            $hashedPassword = $this->passwordHasher->hashPassword($participant, $participantData['password']);
+            $participant->setPassword($hashedPassword);
+
+            $manager->persist($participant);
+
+            // Créer des références pour les autres fixtures
+            $this->addReference('participant_' . $participantData['pseudo'], $participant);
+        }
+
+        $manager->flush();
+    }
+
+    public function getDependencies(): array
+    {
+        return [
+            SiteFixtures::class,
+        ];
+    }
+
+    public static function getGroups(): array
+    {
+        return ['participant'];
+    }
+}

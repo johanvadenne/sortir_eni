@@ -1,0 +1,118 @@
+<form id="lieu-form" method="post" action="{{ path('sortie_map_lieu_new') }}">
+    <div class="row">
+        <div class="col-md-6">
+            <div class="mb-3">
+                {{ form_label(form.nom, null, {'label_attr': {'class': 'form-label'}}) }}
+                {{ form_widget(form.nom, {'attr': {'class': 'form-control'}}) }}
+                {{ form_errors(form.nom) }}
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="mb-3">
+                {{ form_label(form.rue, null, {'label_attr': {'class': 'form-label'}}) }}
+                {{ form_widget(form.rue, {'attr': {'class': 'form-control'}}) }}
+                {{ form_errors(form.rue) }}
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="mb-3">
+                {{ form_label(form.latitude, null, {'label_attr': {'class': 'form-label'}}) }}
+                {{ form_widget(form.latitude, {'attr': {'class': 'form-control', 'readonly': true}}) }}
+                {{ form_errors(form.latitude) }}
+                <div class="form-text">Cliquez sur la carte pour sélectionner la position</div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="mb-3">
+                {{ form_label(form.longitude, null, {'label_attr': {'class': 'form-label'}}) }}
+                {{ form_widget(form.longitude, {'attr': {'class': 'form-control', 'readonly': true}}) }}
+                {{ form_errors(form.longitude) }}
+            </div>
+        </div>
+    </div>
+
+    <div class="mb-3">
+        {{ form_label(form.ville, null, {'label_attr': {'class': 'form-label'}}) }}
+        {{ form_widget(form.ville, {'attr': {'class': 'form-select'}}) }}
+        {{ form_errors(form.ville) }}
+    </div>
+
+    <div class="d-flex justify-content-end gap-2">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+        <button type="submit" class="btn btn-primary">
+            <i class="bi bi-save me-1"></i>Enregistrer
+        </button>
+    </div>
+
+    {{ form_rest(form) }}
+</form>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('lieu-form');
+
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const formData = new FormData(form);
+
+        fetch(form.action, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Fermer le modal
+                const modal = bootstrap.Modal.getInstance(document.getElementById('add-lieu-modal'));
+                modal.hide();
+
+                // Afficher un message de succès
+                showAlert('Lieu ajouté avec succès !', 'success');
+
+                // Recharger les sorties pour afficher le nouveau lieu
+                if (typeof loadSorties === 'function') {
+                    loadSorties();
+                }
+            } else {
+                // Afficher les erreurs
+                if (data.errors && data.errors.length > 0) {
+                    showAlert('Erreurs de validation: ' + data.errors.join(', '), 'danger');
+                } else {
+                    showAlert('Erreur lors de l\'enregistrement du lieu', 'danger');
+                }
+            }
+        })
+        .catch(error => {
+            console.error('Erreur:', error);
+            showAlert('Erreur lors de l\'enregistrement du lieu', 'danger');
+        });
+    });
+});
+
+function showAlert(message, type) {
+    const alertDiv = document.createElement('div');
+    alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
+    alertDiv.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+
+    // Insérer l'alerte en haut de la page
+    const container = document.querySelector('.container-fluid');
+    container.insertBefore(alertDiv, container.firstChild);
+
+    // Supprimer l'alerte après 5 secondes
+    setTimeout(() => {
+        if (alertDiv.parentNode) {
+            alertDiv.remove();
+        }
+    }, 5000);
+}
+</script>

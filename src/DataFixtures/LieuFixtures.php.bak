@@ -1,0 +1,110 @@
+<?php
+
+namespace App\DataFixtures;
+
+use App\Entity\Lieu;
+use Doctrine\Bundle\FixturesBundle\Fixture;
+use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
+use Doctrine\Persistence\ObjectManager;
+
+class LieuFixtures extends Fixture implements FixtureGroupInterface
+{
+    public function load(ObjectManager $manager): void
+    {
+        $lieux = [
+            // Nantes
+            ['nom' => 'Château des Ducs de Bretagne', 'rue' => '4 Place Marc Elder', 'latitude' => 47.2167, 'longitude' => -1.5500, 'ville' => 'nantes'],
+            ['nom' => 'Jardin des Plantes', 'rue' => 'Rue Stanislas Baudry', 'latitude' => 47.2133, 'longitude' => -1.5400, 'ville' => 'nantes'],
+            ['nom' => 'Île de Nantes', 'rue' => 'Quai de la Fosse', 'latitude' => 47.2100, 'longitude' => -1.5600, 'ville' => 'nantes'],
+
+            // Rennes
+            ['nom' => 'Parc du Thabor', 'rue' => 'Place Saint-Mélaine', 'latitude' => 48.1136, 'longitude' => -1.6753, 'ville' => 'rennes'],
+            ['nom' => 'Place de la Mairie', 'rue' => 'Place de la Mairie', 'latitude' => 48.1113, 'longitude' => -1.6800, 'ville' => 'rennes'],
+            ['nom' => 'Cathédrale Saint-Pierre', 'rue' => 'Rue de la Monnaie', 'latitude' => 48.1119, 'longitude' => -1.6828, 'ville' => 'rennes'],
+
+            // Angers
+            ['nom' => 'Château d\'Angers', 'rue' => '2 Promenade du Bout du Monde', 'latitude' => 47.4700, 'longitude' => -0.5600, 'ville' => 'angers'],
+            ['nom' => 'Jardin des Plantes d\'Angers', 'rue' => 'Rue du Haras', 'latitude' => 47.4733, 'longitude' => -0.5533, 'ville' => 'angers'],
+
+            // Le Mans
+            ['nom' => 'Cathédrale Saint-Julien', 'rue' => 'Place Saint-Michel', 'latitude' => 48.0067, 'longitude' => 0.2000, 'ville' => 'le_mans'],
+            ['nom' => 'Circuit de la Sarthe', 'rue' => 'Route de Mulsanne', 'latitude' => 47.9500, 'longitude' => 0.2167, 'ville' => 'le_mans'],
+
+            // Tours
+            ['nom' => 'Place Plumereau', 'rue' => 'Place Plumereau', 'latitude' => 47.3933, 'longitude' => 0.6867, 'ville' => 'tours'],
+            ['nom' => 'Cathédrale Saint-Gatien', 'rue' => 'Place de la Cathédrale', 'latitude' => 47.3950, 'longitude' => 0.6950, 'ville' => 'tours'],
+
+            // Orléans
+            ['nom' => 'Place du Martroi', 'rue' => 'Place du Martroi', 'latitude' => 47.9019, 'longitude' => 1.9094, 'ville' => 'orleans'],
+            ['nom' => 'Cathédrale Sainte-Croix', 'rue' => 'Place Sainte-Croix', 'latitude' => 47.9019, 'longitude' => 1.9094, 'ville' => 'orleans'],
+
+            // Paris
+            ['nom' => 'Tour Eiffel', 'rue' => 'Champ de Mars', 'latitude' => 48.8584, 'longitude' => 2.2945, 'ville' => 'paris'],
+            ['nom' => 'Louvre', 'rue' => 'Rue de Rivoli', 'latitude' => 48.8606, 'longitude' => 2.3376, 'ville' => 'paris'],
+            ['nom' => 'Notre-Dame', 'rue' => 'Parvis Notre-Dame', 'latitude' => 48.8530, 'longitude' => 2.3499, 'ville' => 'paris'],
+
+            // Lyon
+            ['nom' => 'Basilique Notre-Dame de Fourvière', 'rue' => '8 Place de Fourvière', 'latitude' => 45.7622, 'longitude' => 4.8228, 'ville' => 'lyon'],
+            ['nom' => 'Place Bellecour', 'rue' => 'Place Bellecour', 'latitude' => 45.7578, 'longitude' => 4.8322, 'ville' => 'lyon'],
+
+            // Marseille
+            ['nom' => 'Vieux Port', 'rue' => 'Quai du Port', 'latitude' => 43.2947, 'longitude' => 5.3756, 'ville' => 'marseille'],
+            ['nom' => 'Basilique Notre-Dame de la Garde', 'rue' => 'Rue Fort du Sanctuaire', 'latitude' => 43.2841, 'longitude' => 5.3711, 'ville' => 'marseille'],
+
+            // Toulouse
+            ['nom' => 'Capitole', 'rue' => 'Place du Capitole', 'latitude' => 43.6047, 'longitude' => 1.4442, 'ville' => 'toulouse'],
+            ['nom' => 'Basilique Saint-Sernin', 'rue' => 'Place Saint-Sernin', 'latitude' => 43.6081, 'longitude' => 1.4428, 'ville' => 'toulouse'],
+
+            // Bordeaux
+            ['nom' => 'Place de la Bourse', 'rue' => 'Place de la Bourse', 'latitude' => 44.8419, 'longitude' => -0.5708, 'ville' => 'bordeaux'],
+            ['nom' => 'Cathédrale Saint-André', 'rue' => 'Place Pey-Berland', 'latitude' => 44.8378, 'longitude' => -0.5794, 'ville' => 'bordeaux'],
+
+            // Lille
+            ['nom' => 'Grand Place', 'rue' => 'Place du Général de Gaulle', 'latitude' => 50.6372, 'longitude' => 3.0633, 'ville' => 'lille'],
+            ['nom' => 'Palais des Beaux-Arts', 'rue' => 'Place de la République', 'latitude' => 50.6306, 'longitude' => 3.0628, 'ville' => 'lille'],
+
+            // Strasbourg
+            ['nom' => 'Cathédrale Notre-Dame', 'rue' => 'Place de la Cathédrale', 'latitude' => 48.5819, 'longitude' => 7.7508, 'ville' => 'strasbourg'],
+            ['nom' => 'Petite France', 'rue' => 'Quai de la Petite France', 'latitude' => 48.5806, 'longitude' => 7.7419, 'ville' => 'strasbourg'],
+
+            // Montpellier
+            ['nom' => 'Place de la Comédie', 'rue' => 'Place de la Comédie', 'latitude' => 43.6081, 'longitude' => 3.8769, 'ville' => 'montpellier'],
+            ['nom' => 'Arc de Triomphe', 'rue' => 'Rue Foch', 'latitude' => 43.6119, 'longitude' => 3.8769, 'ville' => 'montpellier'],
+
+            // Nice
+            ['nom' => 'Promenade des Anglais', 'rue' => 'Promenade des Anglais', 'latitude' => 43.6951, 'longitude' => 7.2716, 'ville' => 'nice'],
+            ['nom' => 'Vieux Nice', 'rue' => 'Cours Saleya', 'latitude' => 43.6961, 'longitude' => 7.2756, 'ville' => 'nice']
+        ];
+
+        foreach ($lieux as $lieuData) {
+            $lieu = new Lieu();
+            $lieu->setNom($lieuData['nom']);
+            $lieu->setRue($lieuData['rue']);
+            $lieu->setLatitude($lieuData['latitude']);
+            $lieu->setLongitude($lieuData['longitude']);
+
+            // Récupérer la ville par référence
+            $ville = $this->getReference('ville_' . strtolower(str_replace([' ', 'é', 'è', 'ç'], ['_', 'e', 'e', 'c'], $lieuData['ville'])), \App\Entity\Ville::class);
+            $lieu->setVille($ville);
+
+            $manager->persist($lieu);
+
+            // Créer des références pour les autres fixtures
+            $this->addReference('lieu_' . strtolower(str_replace([' ', '\'', '-', 'é', 'è', 'ç'], ['_', '', '_', 'e', 'e', 'c'], $lieuData['nom'])), $lieu);
+        }
+
+        $manager->flush();
+    }
+
+    public function getDependencies(): array
+    {
+        return [
+            VilleFixtures::class,
+        ];
+    }
+
+    public static function getGroups(): array
+    {
+        return ['lieu'];
+    }
+}

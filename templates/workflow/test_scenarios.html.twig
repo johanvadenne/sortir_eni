@@ -1,0 +1,39 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Test des Scénarios Workflow{% endblock %}
+
+{% block body %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-12">
+            <h1>Test des Scénarios Workflow</h1>
+
+            {% for scenarioName, scenario in scenarios %}
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h3>Scénario: {{ scenarioName|title }}</h3>
+                    </div>
+                    <div class="card-body">
+                        {% for key, value in scenario %}
+                            <div class="alert alert-info">
+                                <strong>{{ key|title }}:</strong>
+                                {% if value is same as(true) %}
+                                    <span class="text-success">✓ Oui</span>
+                                {% elseif value is same as(false) %}
+                                    <span class="text-danger">✗ Non</span>
+                                {% else %}
+                                    {{ value }}
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endfor %}
+
+            <div class="mt-4">
+                <a href="{{ path('workflow_index') }}" class="btn btn-secondary">Retour au workflow</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

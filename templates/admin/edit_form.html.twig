@@ -1,0 +1,24 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ form_title }}{% endblock %}
+
+{% block main_class %}py-4{% endblock %}
+
+{% block body %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            {% include 'form/base_form.html.twig' with {
+                'form_title': form_title,
+                'form_icon': form_icon|default('pencil'),
+                'submit_button_text': submit_button_text|default('Enregistrer'),
+                'cancel_url': cancel_url|default('javascript:history.back()')
+            } %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block form_fields %}
+    {% block admin_form_fields %}{% endblock %}
+{% endblock %}

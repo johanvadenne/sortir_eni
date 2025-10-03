@@ -1,0 +1,44 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Profil de {{ participant.pseudo }}{% endblock %}
+
+{% block main_class %}py-4{% endblock %}
+
+{% block body %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-info text-white">
+                    <h3 class="mb-0"><i class="bi bi-person-circle"></i> Profil de {{ participant.pseudo }}</h3>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>Pseudo:</strong> {{ participant.pseudo }}</p>
+                            <p><strong>Nom:</strong> {{ participant.nom }}</p>
+                            <p><strong>Prénom:</strong> {{ participant.prenom }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Téléphone:</strong> {{ participant.telephone ?: 'Non renseigné' }}</p>
+                            <p><strong>Email:</strong> {{ participant.mail }}</p>
+                            <p><strong>Site:</strong> {{ participant.site.nom }}</p>
+                        </div>
+                    </div>
+
+                    {% if participant.administrateur %}
+                        <div class="mt-3">
+                            <span class="badge bg-danger">Administrateur</span>
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="card-footer">
+                    <a href="{{ path('home') }}" class="btn btn-secondary">
+                        <i class="bi bi-arrow-left"></i> Retour
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

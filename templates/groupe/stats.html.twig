@@ -1,0 +1,206 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Statistiques des groupes{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="h3 mb-0">
+                    <i class="fas fa-chart-bar me-2"></i>Statistiques des groupes
+                </h1>
+                <div>
+                    <a href="{{ path('groupe_index') }}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-1"></i>Retour aux groupes
+                    </a>
+                </div>
+            </div>
+
+            <!-- Vue d'ensemble -->
+            <div class="row mb-4">
+                <div class="col-md-3">
+                    <div class="card text-center">
+                        <div class="card-body">
+                            <h2 class="text-primary">{{ stats.total }}</h2>
+                            <small class="text-muted">Groupes actifs</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-center">
+                        <div class="card-body">
+                            <h2 class="text-success">{{ stats.empty|length }}</h2>
+                            <small class="text-muted">Groupes vides</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-center">
+                        <div class="card-body">
+                            <h2 class="text-warning">{{ stats.withOneParticipant|length }}</h2>
+                            <small class="text-muted">Groupes à 1 membre</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-center">
+                        <div class="card-body">
+                            <h2 class="text-info">{{ stats.recentlyCreated|length }}</h2>
+                            <small class="text-muted">Créés récemment</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <!-- Groupes les plus populaires -->
+                <div class="col-md-6 mb-4">
+                    <div class="card h-100">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">
+                                <i class="fas fa-trophy me-2"></i>Groupes les plus populaires
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            {% if stats.mostPopular is empty %}
+                                <p class="text-muted text-center">Aucun groupe trouvé.</p>
+                            {% else %}
+                                <div class="list-group list-group-flush">
+                                    {% for groupe in stats.mostPopular %}
+                                        <div class="list-group-item d-flex justify-content-between align-items-center px-0">
+                                            <div>
+                                                <h6 class="mb-1">{{ groupe[0].nom }}</h6>
+                                                <small class="text-muted">{{ groupe[0].description|slice(0, 50) }}{% if groupe[0].description|length > 50 %}...{% endif %}</small>
+                                            </div>
+                                            <span class="badge bg-primary">{{ groupe['participantCount'] }} membres</span>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Groupes les plus actifs -->
+                <div class="col-md-6 mb-4">
+                    <div class="card h-100">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">
+                                <i class="fas fa-calendar-alt me-2"></i>Groupes les plus actifs
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            {% if stats.mostActive is empty %}
+                                <p class="text-muted text-center">Aucun groupe trouvé.</p>
+                            {% else %}
+                                <div class="list-group list-group-flush">
+                                    {% for groupe in stats.mostActive %}
+                                        <div class="list-group-item d-flex justify-content-between align-items-center px-0">
+                                            <div>
+                                                <h6 class="mb-1">{{ groupe[0].nom }}</h6>
+                                                <small class="text-muted">{{ groupe[0].description|slice(0, 50) }}{% if groupe[0].description|length > 50 %}...{% endif %}</small>
+                                            </div>
+                                            <span class="badge bg-success">{{ groupe['sortieCount'] }} sorties</span>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <!-- Groupes récemment créés -->
+                <div class="col-md-6 mb-4">
+                    <div class="card h-100">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">
+                                <i class="fas fa-clock me-2"></i>Groupes récemment créés
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            {% if stats.recentlyCreated is empty %}
+                                <p class="text-muted text-center">Aucun groupe trouvé.</p>
+                            {% else %}
+                                <div class="list-group list-group-flush">
+                                    {% for groupe in stats.recentlyCreated %}
+                                        <div class="list-group-item d-flex justify-content-between align-items-center px-0">
+                                            <div>
+                                                <h6 class="mb-1">{{ groupe.nom }}</h6>
+                                                <small class="text-muted">Créé par {{ groupe.createur.prenom }} {{ groupe.createur.nom }}</small>
+                                            </div>
+                                            <small class="text-muted">{{ groupe.dateCreation|date('d/m/Y') }}</small>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Groupes vides -->
+                <div class="col-md-6 mb-4">
+                    <div class="card h-100">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">
+                                <i class="fas fa-exclamation-triangle me-2"></i>Groupes vides
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            {% if stats.empty is empty %}
+                                <p class="text-success text-center">Excellent ! Aucun groupe vide.</p>
+                            {% else %}
+                                <div class="list-group list-group-flush">
+                                    {% for groupe in stats.empty %}
+                                        <div class="list-group-item d-flex justify-content-between align-items-center px-0">
+                                            <div>
+                                                <h6 class="mb-1">{{ groupe.nom }}</h6>
+                                                <small class="text-muted">Créé par {{ groupe.createur.prenom }} {{ groupe.createur.nom }}</small>
+                                            </div>
+                                            <span class="badge bg-warning">Vide</span>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Groupes avec un seul participant -->
+            {% if stats.withOneParticipant is not empty %}
+                <div class="row">
+                    <div class="col-12 mb-4">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">
+                                    <i class="fas fa-user me-2"></i>Groupes avec un seul participant
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    {% for groupe in stats.withOneParticipant %}
+                                        <div class="col-md-6 col-lg-4 mb-3">
+                                            <div class="card border-warning">
+                                                <div class="card-body">
+                                                    <h6 class="card-title">{{ groupe[0].nom }}</h6>
+                                                    <p class="card-text text-muted">{{ groupe[0].description|slice(0, 80) }}{% if groupe[0].description|length > 80 %}...{% endif %}</p>
+                                                    <small class="text-muted">
+                                                        Créé par {{ groupe[0].createur.prenom }} {{ groupe[0].createur.nom }}
+                                                    </small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

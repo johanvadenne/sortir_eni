@@ -1,0 +1,186 @@
+<?php
+
+namespace App\DataFixtures;
+
+use App\Entity\Inscription;
+use Doctrine\Bundle\FixturesBundle\Fixture;
+use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
+use Doctrine\Persistence\ObjectManager;
+
+class InscriptionFixtures extends Fixture implements FixtureGroupInterface
+{
+    public function load(ObjectManager $manager): void
+    {
+        $inscriptions = [
+            // Inscriptions pour "Découverte du Vieux Angers" (ouverte)
+            ['sortie' => 'decouverte_du_vieux_angers', 'participant' => 'marie.martin'],
+            ['sortie' => 'decouverte_du_vieux_angers', 'participant' => 'pierre.bernard'],
+            ['sortie' => 'decouverte_du_vieux_angers', 'participant' => 'sophie.leroy'],
+            ['sortie' => 'decouverte_du_vieux_angers', 'participant' => 'thomas.petit'],
+            ['sortie' => 'decouverte_du_vieux_angers', 'participant' => 'laura.durand'],
+
+            // Inscriptions pour "Circuit automobile au Mans" (ouverte)
+            ['sortie' => 'circuit_automobile_au_mans', 'participant' => 'alexandre.moreau'],
+            ['sortie' => 'circuit_automobile_au_mans', 'participant' => 'camille.simon'],
+            ['sortie' => 'circuit_automobile_au_mans', 'participant' => 'nicolas.laurent'],
+            ['sortie' => 'circuit_automobile_au_mans', 'participant' => 'julie.lefebvre'],
+            ['sortie' => 'circuit_automobile_au_mans', 'participant' => 'antoine.michel'],
+            ['sortie' => 'circuit_automobile_au_mans', 'participant' => 'emma.garcia'],
+            ['sortie' => 'circuit_automobile_au_mans', 'participant' => 'quentin.david'],
+
+            // Inscriptions pour "Dégustation de vins à Tours" (ouverte)
+            ['sortie' => 'degustation_de_vins_a_tours', 'participant' => 'jean.dupont'],
+            ['sortie' => 'degustation_de_vins_a_tours', 'participant' => 'marie.martin'],
+            ['sortie' => 'degustation_de_vins_a_tours', 'participant' => 'pierre.bernard'],
+            ['sortie' => 'degustation_de_vins_a_tours', 'participant' => 'sophie.leroy'],
+            ['sortie' => 'degustation_de_vins_a_tours', 'participant' => 'thomas.petit'],
+            ['sortie' => 'degustation_de_vins_a_tours', 'participant' => 'laura.durand'],
+            ['sortie' => 'degustation_de_vins_a_tours', 'participant' => 'alexandre.moreau'],
+            ['sortie' => 'degustation_de_vins_a_tours', 'participant' => 'camille.simon'],
+            ['sortie' => 'degustation_de_vins_a_tours', 'participant' => 'nicolas.laurent'],
+            ['sortie' => 'degustation_de_vins_a_tours', 'participant' => 'julie.lefebvre'],
+            ['sortie' => 'degustation_de_vins_a_tours', 'participant' => 'antoine.michel'],
+            ['sortie' => 'degustation_de_vins_a_tours', 'participant' => 'emma.garcia'],
+            ['sortie' => 'degustation_de_vins_a_tours', 'participant' => 'quentin.david'],
+
+            // Inscriptions pour "Visite d'Orléans historique" (clôturée)
+            ['sortie' => 'visite_dorleans_historique', 'participant' => 'jean.dupont'],
+            ['sortie' => 'visite_dorleans_historique', 'participant' => 'marie.martin'],
+            ['sortie' => 'visite_dorleans_historique', 'participant' => 'pierre.bernard'],
+            ['sortie' => 'visite_dorleans_historique', 'participant' => 'sophie.leroy'],
+            ['sortie' => 'visite_dorleans_historique', 'participant' => 'thomas.petit'],
+            ['sortie' => 'visite_dorleans_historique', 'participant' => 'laura.durand'],
+            ['sortie' => 'visite_dorleans_historique', 'participant' => 'alexandre.moreau'],
+            ['sortie' => 'visite_dorleans_historique', 'participant' => 'camille.simon'],
+            ['sortie' => 'visite_dorleans_historique', 'participant' => 'nicolas.laurent'],
+            ['sortie' => 'visite_dorleans_historique', 'participant' => 'julie.lefebvre'],
+            ['sortie' => 'visite_dorleans_historique', 'participant' => 'antoine.michel'],
+            ['sortie' => 'visite_dorleans_historique', 'participant' => 'emma.garcia'],
+            ['sortie' => 'visite_dorleans_historique', 'participant' => 'quentin.david'],
+
+            // Inscriptions pour "Escalade en salle" (clôturée)
+            ['sortie' => 'escalade_en_salle', 'participant' => 'jean.dupont'],
+            ['sortie' => 'escalade_en_salle', 'participant' => 'marie.martin'],
+            ['sortie' => 'escalade_en_salle', 'participant' => 'pierre.bernard'],
+            ['sortie' => 'escalade_en_salle', 'participant' => 'sophie.leroy'],
+            ['sortie' => 'escalade_en_salle', 'participant' => 'thomas.petit'],
+            ['sortie' => 'escalade_en_salle', 'participant' => 'laura.durand'],
+            ['sortie' => 'escalade_en_salle', 'participant' => 'alexandre.moreau'],
+            ['sortie' => 'escalade_en_salle', 'participant' => 'camille.simon'],
+            ['sortie' => 'escalade_en_salle', 'participant' => 'nicolas.laurent'],
+            ['sortie' => 'escalade_en_salle', 'participant' => 'julie.lefebvre'],
+
+            // Inscriptions pour "Concert de musique classique" (en cours)
+            ['sortie' => 'concert_de_musique_classique', 'participant' => 'jean.dupont'],
+            ['sortie' => 'concert_de_musique_classique', 'participant' => 'marie.martin'],
+            ['sortie' => 'concert_de_musique_classique', 'participant' => 'pierre.bernard'],
+            ['sortie' => 'concert_de_musique_classique', 'participant' => 'sophie.leroy'],
+            ['sortie' => 'concert_de_musique_classique', 'participant' => 'thomas.petit'],
+            ['sortie' => 'concert_de_musique_classique', 'participant' => 'laura.durand'],
+            ['sortie' => 'concert_de_musique_classique', 'participant' => 'alexandre.moreau'],
+            ['sortie' => 'concert_de_musique_classique', 'participant' => 'camille.simon'],
+            ['sortie' => 'concert_de_musique_classique', 'participant' => 'nicolas.laurent'],
+            ['sortie' => 'concert_de_musique_classique', 'participant' => 'julie.lefebvre'],
+            ['sortie' => 'concert_de_musique_classique', 'participant' => 'antoine.michel'],
+            ['sortie' => 'concert_de_musique_classique', 'participant' => 'emma.garcia'],
+            ['sortie' => 'concert_de_musique_classique', 'participant' => 'quentin.david'],
+            ['sortie' => 'concert_de_musique_classique', 'participant' => 'admin'],
+
+            // Inscriptions pour "Exposition d'art moderne" (terminée)
+            ['sortie' => 'exposition_dart_moderne', 'participant' => 'jean.dupont'],
+            ['sortie' => 'exposition_dart_moderne', 'participant' => 'marie.martin'],
+            ['sortie' => 'exposition_dart_moderne', 'participant' => 'pierre.bernard'],
+            ['sortie' => 'exposition_dart_moderne', 'participant' => 'sophie.leroy'],
+            ['sortie' => 'exposition_dart_moderne', 'participant' => 'thomas.petit'],
+            ['sortie' => 'exposition_dart_moderne', 'participant' => 'laura.durand'],
+            ['sortie' => 'exposition_dart_moderne', 'participant' => 'alexandre.moreau'],
+            ['sortie' => 'exposition_dart_moderne', 'participant' => 'camille.simon'],
+            ['sortie' => 'exposition_dart_moderne', 'participant' => 'nicolas.laurent'],
+            ['sortie' => 'exposition_dart_moderne', 'participant' => 'julie.lefebvre'],
+            ['sortie' => 'exposition_dart_moderne', 'participant' => 'antoine.michel'],
+            ['sortie' => 'exposition_dart_moderne', 'participant' => 'emma.garcia'],
+            ['sortie' => 'exposition_dart_moderne', 'participant' => 'quentin.david'],
+            ['sortie' => 'exposition_dart_moderne', 'participant' => 'admin'],
+
+            // Inscriptions pour "Randonnée en montagne" (terminée)
+            ['sortie' => 'randonnee_en_montagne', 'participant' => 'jean.dupont'],
+            ['sortie' => 'randonnee_en_montagne', 'participant' => 'marie.martin'],
+            ['sortie' => 'randonnee_en_montagne', 'participant' => 'pierre.bernard'],
+            ['sortie' => 'randonnee_en_montagne', 'participant' => 'sophie.leroy'],
+            ['sortie' => 'randonnee_en_montagne', 'participant' => 'thomas.petit'],
+            ['sortie' => 'randonnee_en_montagne', 'participant' => 'laura.durand'],
+            ['sortie' => 'randonnee_en_montagne', 'participant' => 'alexandre.moreau'],
+            ['sortie' => 'randonnee_en_montagne', 'participant' => 'camille.simon'],
+            ['sortie' => 'randonnee_en_montagne', 'participant' => 'nicolas.laurent'],
+            ['sortie' => 'randonnee_en_montagne', 'participant' => 'julie.lefebvre'],
+            ['sortie' => 'randonnee_en_montagne', 'participant' => 'antoine.michel'],
+            ['sortie' => 'randonnee_en_montagne', 'participant' => 'emma.garcia'],
+
+            // Inscriptions pour "Visite de Paris historique" (historisée)
+            ['sortie' => 'visite_de_paris_historique', 'participant' => 'jean.dupont'],
+            ['sortie' => 'visite_de_paris_historique', 'participant' => 'marie.martin'],
+            ['sortie' => 'visite_de_paris_historique', 'participant' => 'pierre.bernard'],
+            ['sortie' => 'visite_de_paris_historique', 'participant' => 'sophie.leroy'],
+            ['sortie' => 'visite_de_paris_historique', 'participant' => 'thomas.petit'],
+            ['sortie' => 'visite_de_paris_historique', 'participant' => 'laura.durand'],
+            ['sortie' => 'visite_de_paris_historique', 'participant' => 'alexandre.moreau'],
+            ['sortie' => 'visite_de_paris_historique', 'participant' => 'camille.simon'],
+            ['sortie' => 'visite_de_paris_historique', 'participant' => 'nicolas.laurent'],
+            ['sortie' => 'visite_de_paris_historique', 'participant' => 'julie.lefebvre'],
+            ['sortie' => 'visite_de_paris_historique', 'participant' => 'antoine.michel'],
+            ['sortie' => 'visite_de_paris_historique', 'participant' => 'emma.garcia'],
+            ['sortie' => 'visite_de_paris_historique', 'participant' => 'quentin.david'],
+            ['sortie' => 'visite_de_paris_historique', 'participant' => 'admin'],
+
+            // Inscriptions pour "Croisière sur la Seine" (historisée)
+            ['sortie' => 'croisiere_sur_la_seine', 'participant' => 'jean.dupont'],
+            ['sortie' => 'croisiere_sur_la_seine', 'participant' => 'marie.martin'],
+            ['sortie' => 'croisiere_sur_la_seine', 'participant' => 'pierre.bernard'],
+            ['sortie' => 'croisiere_sur_la_seine', 'participant' => 'sophie.leroy'],
+            ['sortie' => 'croisiere_sur_la_seine', 'participant' => 'thomas.petit'],
+            ['sortie' => 'croisiere_sur_la_seine', 'participant' => 'laura.durand'],
+            ['sortie' => 'croisiere_sur_la_seine', 'participant' => 'alexandre.moreau'],
+            ['sortie' => 'croisiere_sur_la_seine', 'participant' => 'camille.simon'],
+            ['sortie' => 'croisiere_sur_la_seine', 'participant' => 'nicolas.laurent'],
+            ['sortie' => 'croisiere_sur_la_seine', 'participant' => 'julie.lefebvre'],
+            ['sortie' => 'croisiere_sur_la_seine', 'participant' => 'antoine.michel'],
+            ['sortie' => 'croisiere_sur_la_seine', 'participant' => 'emma.garcia'],
+            ['sortie' => 'croisiere_sur_la_seine', 'participant' => 'quentin.david'],
+            ['sortie' => 'croisiere_sur_la_seine', 'participant' => 'admin']
+        ];
+
+        foreach ($inscriptions as $inscriptionData) {
+            $inscription = new Inscription();
+
+            // Récupérer la sortie par référence
+            $sortie = $this->getReference('sortie_' . $inscriptionData['sortie'], \App\Entity\Sortie::class);
+            $inscription->setSortie($sortie);
+            
+            // Récupérer le participant par référence
+            $participant = $this->getReference('participant_' . $inscriptionData['participant'], \App\Entity\Participant::class);
+            $inscription->setParticipant($participant);
+
+            // Date d'inscription (aléatoire dans les 30 derniers jours)
+            $dateInscription = new \DateTime();
+            $dateInscription->modify('-' . rand(1, 30) . ' days');
+            $inscription->setDateInscription($dateInscription);
+
+            $manager->persist($inscription);
+        }
+
+        $manager->flush();
+    }
+
+    public function getDependencies(): array
+    {
+        return [
+            SortieFixtures::class,
+            ParticipantFixtures::class,
+        ];
+    }
+
+    public static function getGroups(): array
+    {
+        return ['inscription'];
+    }
+}

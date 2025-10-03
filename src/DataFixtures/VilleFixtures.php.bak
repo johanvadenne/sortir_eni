@@ -1,0 +1,50 @@
+<?php
+
+namespace App\DataFixtures;
+
+use App\Entity\Ville;
+use Doctrine\Bundle\FixturesBundle\Fixture;
+use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
+use Doctrine\Persistence\ObjectManager;
+
+class VilleFixtures extends Fixture implements FixtureGroupInterface
+{
+    public function load(ObjectManager $manager): void
+    {
+        $villes = [
+            ['nom' => 'Nantes', 'codePostal' => '44000'],
+            ['nom' => 'Rennes', 'codePostal' => '35000'],
+            ['nom' => 'Angers', 'codePostal' => '49000'],
+            ['nom' => 'Le Mans', 'codePostal' => '72000'],
+            ['nom' => 'Tours', 'codePostal' => '37000'],
+            ['nom' => 'Orléans', 'codePostal' => '45000'],
+            ['nom' => 'Paris', 'codePostal' => '75001'],
+            ['nom' => 'Lyon', 'codePostal' => '69001'],
+            ['nom' => 'Marseille', 'codePostal' => '13001'],
+            ['nom' => 'Toulouse', 'codePostal' => '31000'],
+            ['nom' => 'Bordeaux', 'codePostal' => '33000'],
+            ['nom' => 'Lille', 'codePostal' => '59000'],
+            ['nom' => 'Strasbourg', 'codePostal' => '67000'],
+            ['nom' => 'Montpellier', 'codePostal' => '34000'],
+            ['nom' => 'Nice', 'codePostal' => '06000']
+        ];
+
+        foreach ($villes as $villeData) {
+            $ville = new Ville();
+            $ville->setNom($villeData['nom']);
+            $ville->setCodePostal($villeData['codePostal']);
+
+            $manager->persist($ville);
+
+            // Créer des références pour les autres fixtures
+            $this->addReference('ville_' . strtolower(str_replace([' ', 'é', 'è', 'ç'], ['_', 'e', 'e', 'c'], $villeData['nom'])), $ville);
+        }
+
+        $manager->flush();
+    }
+
+    public static function getGroups(): array
+    {
+        return ['ville'];
+    }
+}

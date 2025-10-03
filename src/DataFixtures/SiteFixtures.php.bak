@@ -1,0 +1,40 @@
+<?php
+
+namespace App\DataFixtures;
+
+use App\Entity\Site;
+use Doctrine\Bundle\FixturesBundle\Fixture;
+use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
+use Doctrine\Persistence\ObjectManager;
+
+class SiteFixtures extends Fixture implements FixtureGroupInterface
+{
+    public function load(ObjectManager $manager): void
+    {
+        $sites = [
+            'ENI Nantes',
+            'ENI Rennes',
+            'ENI Angers',
+            'ENI Le Mans',
+            'ENI Tours',
+            'ENI Orléans'
+        ];
+
+        foreach ($sites as $nomSite) {
+            $site = new Site();
+            $site->setNom($nomSite);
+
+            $manager->persist($site);
+
+            // Créer des références pour les autres fixtures
+            $this->addReference('site_' . strtolower(str_replace(' ', '_', $nomSite)), $site);
+        }
+
+        $manager->flush();
+    }
+
+    public static function getGroups(): array
+    {
+        return ['site'];
+    }
+}

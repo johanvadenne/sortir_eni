@@ -1,0 +1,24 @@
+{# Template de base pour tous les formulaires #}
+<div class="card shadow">
+    <div class="card-header bg-primary text-white">
+        <h3 class="mb-0">
+            <i class="bi bi-{{ form_icon|default('form') }}"></i> {{ form_title }}
+        </h3>
+    </div>
+    <div class="card-body">
+        {{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
+            {% block form_fields %}{% endblock %}
+
+            <div class="mt-4">
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        <i class="bi bi-check-circle"></i> {{ submit_button_text|default('Enregistrer') }}
+                    </button>
+                    <a href="{{ cancel_url|default('javascript:history.back()') }}" class="btn btn-secondary btn-lg">
+                        <i class="bi bi-x-circle"></i> Annuler
+                    </a>
+                </div>
+            </div>
+        {{ form_end(form) }}
+    </div>
+</div>

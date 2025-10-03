@@ -1,0 +1,59 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Test des Services de Domaine{% endblock %}
+
+{% block body %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-12">
+            <h1>Test des Services de Domaine</h1>
+
+            {% for serviceName, tests in results %}
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h3>{{ serviceName|title }}</h3>
+                    </div>
+                    <div class="card-body">
+                        {% for testKey, test in tests %}
+                            <div class="alert {% if test.success is defined and test.success %}alert-success{% elseif test.authorized is defined and test.authorized %}alert-success{% elseif test.can_publish is defined and test.can_publish %}alert-success{% elseif test.can_cloture is defined and test.can_cloture %}alert-success{% else %}alert-danger{% endif %}">
+                                <h5>{{ test.test }}</h5>
+
+                                {% if test.initial_state is defined %}
+                                    <p><strong>État initial:</strong> {{ test.initial_state }}</p>
+                                {% endif %}
+
+                                {% if test.final_state is defined %}
+                                    <p><strong>État final:</strong> {{ test.final_state }}</p>
+                                {% endif %}
+
+                                {% if test.success is defined %}
+                                    <p><strong>Résultat:</strong> {{ test.success ? '✓ Succès' : '✗ Échec' }}</p>
+                                    {% if test.error is defined and test.error %}
+                                        <p><strong>Erreur:</strong> {{ test.error }}</p>
+                                    {% endif %}
+                                    {% if test.inscription_id is defined %}
+                                        <p><strong>ID Inscription:</strong> {{ test.inscription_id }}</p>
+                                    {% endif %}
+                                    {% if test.nb_inscriptions is defined %}
+                                        <p><strong>Nombre d'inscriptions:</strong> {{ test.nb_inscriptions }}</p>
+                                    {% endif %}
+                                {% elseif test.authorized is defined %}
+                                    <p><strong>Résultat:</strong> {{ test.authorized ? '✓ Autorisé' : '✗ Interdit' }}</p>
+                                {% elseif test.can_publish is defined %}
+                                    <p><strong>Résultat:</strong> {{ test.can_publish ? '✓ Peut publier' : '✗ Ne peut pas publier' }}</p>
+                                {% elseif test.can_cloture is defined %}
+                                    <p><strong>Résultat:</strong> {{ test.can_cloture ? '✓ Peut clôturer' : '✗ Ne peut pas clôturer' }}</p>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endfor %}
+
+            <div class="mt-4">
+                <a href="{{ path('admin_dashboard') }}" class="btn btn-secondary">Retour à l'administration</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

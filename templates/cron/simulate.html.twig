@@ -1,0 +1,114 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Simulation des Transitions CRON{% endblock %}
+
+{% block body %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-12">
+            <h1>Simulation des Transitions CRON</h1>
+
+            <div class="alert alert-info">
+                <h5>Heure actuelle : {{ now|date('d/m/Y H:i:s') }}</h5>
+                <p>Simulation des transitions qui seraient effectuées par la commande CRON.</p>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5>Ouverte → Clôturée ({{ results.cloturee|length }})</h5>
+                        </div>
+                        <div class="card-body">
+                            {% if results.cloturee is empty %}
+                                <p class="text-muted">Aucune sortie à clôturer</p>
+                            {% else %}
+                                <ul class="list-group">
+                                    {% for data in results.cloturee %}
+                                        <li class="list-group-item">
+                                            <strong>{{ data.sortie.nom }}</strong><br>
+                                            <small class="text-muted">{{ data.reason }}</small>
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5>Clôturée → Activité en cours ({{ results.en_cours|length }})</h5>
+                        </div>
+                        <div class="card-body">
+                            {% if results.en_cours is empty %}
+                                <p class="text-muted">Aucune sortie à démarrer</p>
+                            {% else %}
+                                <ul class="list-group">
+                                    {% for sortie in results.en_cours %}
+                                        <li class="list-group-item">
+                                            <strong>{{ sortie.nom }}</strong><br>
+                                            <small class="text-muted">Début : {{ sortie.dateHeureDebut|date('d/m/Y H:i') }}</small>
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mt-4">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5>Activité en cours → Activité terminée ({{ results.terminee|length }})</h5>
+                        </div>
+                        <div class="card-body">
+                            {% if results.terminee is empty %}
+                                <p class="text-muted">Aucune sortie à terminer</p>
+                            {% else %}
+                                <ul class="list-group">
+                                    {% for sortie in results.terminee %}
+                                        <li class="list-group-item">
+                                            <strong>{{ sortie.nom }}</strong><br>
+                                            <small class="text-muted">Durée : {{ sortie.duree }} minutes</small>
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5>Activité terminée → Activité historisée ({{ results.historisee|length }})</h5>
+                        </div>
+                        <div class="card-body">
+                            {% if results.historisee is empty %}
+                                <p class="text-muted">Aucune sortie à historiser</p>
+                            {% else %}
+                                <ul class="list-group">
+                                    {% for sortie in results.historisee %}
+                                        <li class="list-group-item">
+                                            <strong>{{ sortie.nom }}</strong><br>
+                                            <small class="text-muted">Début : {{ sortie.dateHeureDebut|date('d/m/Y H:i') }}</small>
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-4">
+                <a href="{{ path('cron_index') }}" class="btn btn-secondary">Retour</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,314 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ form_title }}{% endblock %}
+
+{% block main_class %}py-4{% endblock %}
+
+{% block body %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-10 col-lg-8">
+            {% include 'form/base_form.html.twig' with {
+                'form_title': form_title,
+                'form_icon': 'calendar-plus',
+                'submit_button_text': submit_button_text,
+                'cancel_url': cancel_url
+            } %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block form_fields %}
+    <div class="row">
+        <div class="col-12">
+            {{ form_row(form.nom, {'attr': {'class': 'form-control'}}) }}
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            {{ form_row(form.dateHeureDebut, {'attr': {'class': 'form-control'}}) }}
+        </div>
+        <div class="col-md-6">
+            {{ form_row(form.dateLimiteInscription, {'attr': {'class': 'form-control'}}) }}
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            {{ form_row(form.nbInscriptionsMax, {'attr': {'class': 'form-control'}}) }}
+        </div>
+        <div class="col-md-6">
+            {{ form_row(form.duree, {'attr': {'class': 'form-control'}}) }}
+        </div>
+    </div>
+
+            <div class="row">
+                <div class="col-12">
+                    <div class="mb-3">
+                        <label class="form-label">Lieu de la sortie</label>
+                        <div class="btn-group w-100 mb-2" role="group">
+                            <input type="radio" class="btn-check" name="lieu-selection" id="lieu-liste" value="liste" checked>
+                            <label class="btn btn-outline-primary" for="lieu-liste">
+                                <i class="bi bi-list"></i> Choisir dans la liste
+                            </label>
+
+                            <input type="radio" class="btn-check" name="lieu-selection" id="lieu-carte" value="carte">
+                            <label class="btn btn-outline-primary" for="lieu-carte">
+                                <i class="bi bi-geo-alt"></i> Sélectionner sur la carte
+                            </label>
+                        </div>
+
+                        <!-- Sélection par liste -->
+                        <div id="lieu-liste-container">
+                            {{ form_row(form.lieu, {'attr': {'class': 'form-select'}}) }}
+                        </div>
+
+                        <!-- Sélection par carte -->
+                        <div id="lieu-carte-container" style="display: none;">
+                            <div class="card">
+                                <div class="card-header bg-info text-white">
+                                    <h6 class="mb-0"><i class="bi bi-map"></i> Sélection du lieu sur la carte</h6>
+                                </div>
+                                <div class="card-body p-0">
+                                    <div id="lieu-map" style="height: 300px;"></div>
+                                </div>
+                                <div class="card-footer">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <label class="form-label">Nom du lieu</label>
+                                            <input type="text" id="lieu-nom" class="form-control" placeholder="Nom du lieu">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Adresse</label>
+                                            <input type="text" id="lieu-adresse" class="form-control" placeholder="Adresse (optionnel)">
+                                        </div>
+                                    </div>
+                                    <div class="row mt-2">
+                                        <div class="col-md-4">
+                                            <label class="form-label">Latitude</label>
+                                            <input type="number" id="lieu-latitude" class="form-control" step="0.000001" readonly>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label">Longitude</label>
+                                            <input type="number" id="lieu-longitude" class="form-control" step="0.000001" readonly>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label">Ville</label>
+                                            <select id="lieu-ville" class="form-select">
+                                                <option value="">Choisir une ville...</option>
+                                                {% if villes is defined %}
+                                                    {% for ville in villes %}
+                                                        <option value="{{ ville.id }}">{{ ville.nom }} ({{ ville.codePostal }})</option>
+                                                    {% endfor %}
+                                                {% endif %}
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="mt-3">
+                                        <button type="button" id="geocode-btn" class="btn btn-outline-primary btn-sm">
+                                            <i class="bi bi-search"></i> Rechercher l'adresse
+                                        </button>
+                                        <button type="button" id="save-lieu-btn" class="btn btn-success btn-sm">
+                                            <i class="bi bi-check"></i> Utiliser ce lieu
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+    <div class="row">
+        <div class="col-12">
+            {{ form_row(form.infosSortie, {'attr': {'class': 'form-control', 'rows': 4}}) }}
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            {{ form_row(form.urlPhoto, {'attr': {'class': 'form-control'}}) }}
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="{{ asset('assets/js/map.js') }}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Form: DOM loaded, initializing map functionality...');
+            let lieuMap = null;
+            let selectedLocation = null;
+
+            // Gérer le changement de mode de sélection
+            document.querySelectorAll('input[name="lieu-selection"]').forEach(radio => {
+                radio.addEventListener('change', function() {
+                    console.log('Form: Mode de sélection changé:', this.value);
+                    const listeContainer = document.getElementById('lieu-liste-container');
+                    const carteContainer = document.getElementById('lieu-carte-container');
+
+                    if (this.value === 'liste') {
+                        listeContainer.style.display = 'block';
+                        carteContainer.style.display = 'none';
+                    } else {
+                        listeContainer.style.display = 'none';
+                        carteContainer.style.display = 'block';
+
+                        // Initialiser la carte si pas encore fait
+                        if (!lieuMap) {
+                            console.log('Form: Initialisation de la carte...');
+                            initLieuMap();
+                        }
+                    }
+                });
+            });
+
+            function initLieuMap() {
+                try {
+                    console.log('Form: Création de la carte SortirMap...');
+                    lieuMap = new SortirMap('lieu-map', {
+                        center: [47.2184, -1.5536], // Nantes
+                        zoom: 13
+                    });
+                    console.log('Form: Carte créée avec succès');
+                } catch (error) {
+                    console.error('Form: Erreur lors de la création de la carte:', error);
+                }
+
+                // Surcharger la méthode onLocationSelected
+                lieuMap.onLocationSelected = function(lat, lng) {
+                    selectedLocation = { lat, lng };
+                    document.getElementById('lieu-latitude').value = lat.toFixed(6);
+                    document.getElementById('lieu-longitude').value = lng.toFixed(6);
+
+                    // Géocodage inverse pour obtenir l'adresse
+                    reverseGeocode(lat, lng);
+                };
+
+                // Charger les lieux existants
+                loadExistingLieux();
+            }
+
+            function loadExistingLieux() {
+                fetch('{{ path('map_lieux') }}')
+                    .then(response => response.json())
+                    .then(lieux => {
+                        lieux.forEach(lieu => {
+                            lieuMap.addMarker(lieu.latitude, lieu.longitude, {
+                                popup: `
+                                    <div>
+                                        <h6>${lieu.nom}</h6>
+                                        <p class="mb-1">${lieu.rue || 'Adresse non renseignée'}</p>
+                                        <p class="mb-0">${lieu.ville} (${lieu.codePostal})</p>
+                                    </div>
+                                `,
+                                tooltip: lieu.nom
+                            });
+                        });
+                    })
+                    .catch(error => console.error('Erreur lors du chargement des lieux:', error));
+            }
+
+            function reverseGeocode(lat, lng) {
+                const formData = new FormData();
+                formData.append('lat', lat);
+                formData.append('lng', lng);
+
+                fetch('{{ path('map_reverse_geocode') }}', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.street) {
+                        document.getElementById('lieu-adresse').value = data.street;
+                    }
+                    if (data.city) {
+                        // Essayer de trouver la ville correspondante
+                        const villeSelect = document.getElementById('lieu-ville');
+                        for (let option of villeSelect.options) {
+                            if (option.text.includes(data.city)) {
+                                option.selected = true;
+                                break;
+                            }
+                        }
+                    }
+                })
+                .catch(error => console.error('Erreur lors du géocodage inverse:', error));
+            }
+
+            // Bouton de géocodage
+            document.getElementById('geocode-btn').addEventListener('click', function() {
+                const address = document.getElementById('lieu-adresse').value;
+                if (!address) {
+                    alert('Veuillez saisir une adresse');
+                    return;
+                }
+
+                const formData = new FormData();
+                formData.append('address', address);
+
+                fetch('{{ path('map_geocode') }}', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.lat && data.lng) {
+                        lieuMap.setSelectedLocation(data.lat, data.lng);
+                        document.getElementById('lieu-latitude').value = data.lat.toFixed(6);
+                        document.getElementById('lieu-longitude').value = data.lng.toFixed(6);
+                    } else {
+                        alert('Adresse non trouvée');
+                    }
+                })
+                .catch(error => {
+                    console.error('Erreur lors du géocodage:', error);
+                    alert('Erreur lors de la recherche de l\'adresse');
+                });
+            });
+
+            // Bouton de sauvegarde du lieu
+            document.getElementById('save-lieu-btn').addEventListener('click', function() {
+                const nom = document.getElementById('lieu-nom').value;
+                const adresse = document.getElementById('lieu-adresse').value;
+                const latitude = document.getElementById('lieu-latitude').value;
+                const longitude = document.getElementById('lieu-longitude').value;
+                const villeId = document.getElementById('lieu-ville').value;
+
+                if (!nom || !latitude || !longitude || !villeId) {
+                    alert('Veuillez remplir tous les champs obligatoires');
+                    return;
+                }
+
+                // Créer un nouveau lieu
+                const formData = new FormData();
+                formData.append('nom', nom);
+                formData.append('rue', adresse);
+                formData.append('latitude', latitude);
+                formData.append('longitude', longitude);
+                formData.append('ville', villeId);
+
+                fetch('{{ path('lieu_new') }}', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => {
+                    if (response.ok) {
+                        // Recharger la page pour mettre à jour la liste des lieux
+                        window.location.reload();
+                    } else {
+                        alert('Erreur lors de la création du lieu');
+                    }
+                })
+                .catch(error => {
+                    console.error('Erreur:', error);
+                    alert('Erreur lors de la création du lieu');
+                });
+            });
+        });
+    </script>
+{% endblock %}

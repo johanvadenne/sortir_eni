@@ -1,0 +1,71 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Gestion des Sorties{% endblock %}
+
+{% block body %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-12">
+            <h1>Gestion des Sorties</h1>
+
+            <div class="card">
+                <div class="card-body">
+                    {% if sorties is empty %}
+                        <p class="text-muted">Aucune sortie trouvée.</p>
+                    {% else %}
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Nom</th>
+                                        <th>Date</th>
+                                        <th>Organisateur</th>
+                                        <th>État</th>
+                                        <th>Inscriptions</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for sortie in sorties %}
+                                        <tr>
+                                            <td>{{ sortie.nom }}</td>
+                                            <td>{{ sortie.dateHeureDebut|date('d/m/Y H:i') }}</td>
+                                            <td>{{ sortie.organisateur.pseudo }}</td>
+                                            <td>
+                                                <span class="badge bg-{{
+                                                    sortie.etat.libelle == 'Créée' ? 'secondary' :
+                                                    sortie.etat.libelle == 'Ouverte' ? 'success' :
+                                                    sortie.etat.libelle == 'Clôturée' ? 'warning' :
+                                                    sortie.etat.libelle == 'Activité en cours' ? 'primary' :
+                                                    sortie.etat.libelle == 'Activité terminée' ? 'info' :
+                                                    sortie.etat.libelle == 'Annulée' ? 'danger' :
+                                                    'dark'
+                                                }}">
+                                                    {{ sortie.etat.libelle }}
+                                                </span>
+                                            </td>
+                                            <td>{{ sortie.nbInscriptionsActuelles }}/{{ sortie.nbInscriptionsMax }}</td>
+                                            <td>
+                                                <a href="{{ path('sortie_show', {id: sortie.id}) }}" class="btn btn-sm btn-primary">Voir</a>
+                                                {% if sortie.etat.libelle in ['Ouverte', 'Clôturée'] %}
+                                                    <form method="post" action="{{ path('admin_sortie_cancel', {id: sortie.id}) }}" class="d-inline" onsubmit="return confirm('Êtes-vous sûr de vouloir annuler cette sortie ?')">
+                                                        <button type="submit" class="btn btn-sm btn-danger">Annuler</button>
+                                                    </form>
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="mt-4">
+                <a href="{{ path('admin_dashboard') }}" class="btn btn-secondary">Retour à l'administration</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

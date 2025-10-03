@@ -1,0 +1,244 @@
+/* Styles pour mobile - Layout simplifié */
+
+/* Navigation mobile simplifiée */
+@media (max-width: 768px) {
+    .navbar-brand {
+        font-size: 1.2rem;
+    }
+
+    .navbar-nav .nav-link {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.9rem;
+    }
+
+    .dropdown-menu {
+        font-size: 0.9rem;
+    }
+}
+
+/* Cartes adaptées au mobile */
+@media (max-width: 768px) {
+    .card {
+        margin-bottom: 1rem;
+    }
+
+    .card-header h3,
+    .card-header h4,
+    .card-header h5 {
+        font-size: 1.1rem;
+    }
+
+    .card-body {
+        padding: 1rem;
+    }
+}
+
+/* Formulaires mobile */
+@media (max-width: 768px) {
+    .form-label {
+        font-size: 0.9rem;
+        margin-bottom: 0.25rem;
+    }
+
+    .form-control,
+    .form-select {
+        font-size: 0.9rem;
+        padding: 0.5rem 0.75rem;
+    }
+
+    .btn {
+        font-size: 0.9rem;
+        padding: 0.5rem 1rem;
+    }
+}
+
+/* Liste des sorties mobile */
+@media (max-width: 768px) {
+    .sortie-card {
+        margin-bottom: 1rem;
+    }
+
+    .sortie-card .card-body {
+        padding: 0.75rem;
+    }
+
+    .sortie-card .card-title {
+        font-size: 1rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .sortie-card .badge {
+        font-size: 0.7rem;
+    }
+}
+
+/* Détails sortie mobile */
+@media (max-width: 768px) {
+    .sortie-details .row {
+        margin: 0;
+    }
+
+    .sortie-details .col-md-6 {
+        padding: 0.25rem 0;
+    }
+
+    .sortie-details .mb-3 {
+        margin-bottom: 0.75rem !important;
+    }
+}
+
+/* Actions mobile */
+@media (max-width: 768px) {
+    .actions-mobile .btn {
+        width: 100%;
+        margin-bottom: 0.5rem;
+    }
+
+    .actions-mobile .d-grid {
+        gap: 0.5rem;
+    }
+}
+
+/* Filtres mobile */
+@media (max-width: 768px) {
+    .filters-mobile .row {
+        margin: 0;
+    }
+
+    .filters-mobile .col-md-3,
+    .filters-mobile .col-md-6 {
+        padding: 0.25rem 0;
+        margin-bottom: 0.5rem;
+    }
+
+    .filters-mobile .form-control,
+    .filters-mobile .form-select {
+        font-size: 0.85rem;
+    }
+}
+
+/* Profil mobile */
+@media (max-width: 768px) {
+    .profil-mobile .col-md-6 {
+        margin-bottom: 1rem;
+    }
+
+    .profil-mobile .mb-3 {
+        margin-bottom: 0.75rem !important;
+    }
+}
+
+/* Administration mobile */
+@media (max-width: 768px) {
+    .admin-mobile .table-responsive {
+        font-size: 0.8rem;
+    }
+
+    .admin-mobile .btn-sm {
+        font-size: 0.7rem;
+        padding: 0.25rem 0.5rem;
+    }
+
+    .admin-mobile .card-body {
+        padding: 0.75rem;
+    }
+}
+
+/* Flash messages mobile */
+@media (max-width: 768px) {
+    .alert {
+        font-size: 0.9rem;
+        padding: 0.75rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .alert .btn-close {
+        padding: 0.5rem;
+    }
+}
+
+/* Footer mobile */
+@media (max-width: 768px) {
+    footer {
+        font-size: 0.8rem;
+        padding: 1rem 0;
+    }
+}
+
+/* Utilitaires mobile */
+@media (max-width: 768px) {
+    .mobile-hidden {
+        display: none !important;
+    }
+
+    .mobile-only {
+        display: block !important;
+    }
+
+    .desktop-only {
+        display: none !important;
+    }
+
+    .text-mobile-center {
+        text-align: center;
+    }
+
+    .mb-mobile-2 {
+        margin-bottom: 0.5rem !important;
+    }
+
+    .p-mobile-2 {
+        padding: 0.5rem !important;
+    }
+}
+
+/* Amélioration de l'accessibilité mobile */
+@media (max-width: 768px) {
+
+    .btn:focus,
+    .form-control:focus,
+    .form-select:focus {
+        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    }
+
+    .nav-link:focus {
+        background-color: rgba(255, 255, 255, 0.1);
+    }
+}
+
+/* Optimisation des icônes mobile */
+@media (max-width: 768px) {
+    .bi {
+        font-size: 0.9em;
+    }
+
+    .btn .bi {
+        margin-right: 0.25rem;
+    }
+}
+
+/* Amélioration de la lisibilité mobile */
+@media (max-width: 768px) {
+    body {
+        font-size: 0.9rem;
+        line-height: 1.4;
+    }
+
+    h1 {
+        font-size: 1.5rem;
+    }
+
+    h2 {
+        font-size: 1.3rem;
+    }
+
+    h3 {
+        font-size: 1.1rem;
+    }
+
+    h4,
+    h5,
+    h6 {
+        font-size: 1rem;
+    }
+}

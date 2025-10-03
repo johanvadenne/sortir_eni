@@ -1,0 +1,143 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Administration - Sortir{% endblock %}
+
+{% block body %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-12">
+            <h1>Administration</h1>
+
+            <div class="alert alert-info">
+                <h4>Bienvenue dans l'interface d'administration</h4>
+                <p>Vous êtes connecté en tant qu'administrateur.</p>
+            </div>
+
+            <!-- Gestion des données de base -->
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title"><i class="bi bi-building"></i> Gestion des Sites</h5>
+                            <p class="card-text">Gérer les sites de l'ENI</p>
+                            <a href="{{ path('admin_sites') }}" class="btn btn-primary">Accéder</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title"><i class="bi bi-geo-alt"></i> Gestion des Villes</h5>
+                            <p class="card-text">Gérer les villes</p>
+                            <a href="{{ path('admin_villes') }}" class="btn btn-primary">Accéder</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title"><i class="bi bi-people"></i> Gestion des Participants</h5>
+                            <p class="card-text">Gérer les utilisateurs</p>
+                            <a href="{{ path('admin_participants') }}" class="btn btn-primary">Accéder</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Gestion des sorties et lieux -->
+            <div class="row mt-4">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title"><i class="bi bi-calendar-event"></i> Gestion des Sorties</h5>
+                            <p class="card-text">Vue d'ensemble et annulation des sorties</p>
+                            <a href="{{ path('admin_sorties') }}" class="btn btn-primary">Accéder</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title"><i class="bi bi-geo-alt-fill"></i> Gestion des Lieux</h5>
+                            <p class="card-text">CRUD des lieux avec coordonnées GPS</p>
+                            <a href="{{ path('lieu_index') }}" class="btn btn-info">Accéder</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Outils de développement et tests
+            <div class="row mt-4">
+                <div class="col-12">
+                    <h3><i class="bi bi-tools"></i> Outils de Développement</h3>
+                </div>
+            </div>
+
+            <div class="row mt-3">
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title"><i class="bi bi-shield-check"></i> Test des Règles Métier</h5>
+                            <p class="card-text">Vérifier les validations et règles d'autorisation</p>
+                            <a href="{{ path('test_business_rules') }}" class="btn btn-info">Tester</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title"><i class="bi bi-map"></i> Test de la Carte</h5>
+                            <p class="card-text">Tester la fonctionnalité de carte interactive</p>
+                            <a href="{{ path('test_map') }}" class="btn btn-info">Tester la carte</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title"><i class="bi bi-arrow-repeat"></i> Workflow des Sorties</h5>
+                            <p class="card-text">Gérer les transitions d'état des sorties</p>
+                            <a href="{{ path('workflow_index') }}" class="btn btn-warning">Workflow</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mt-3">
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title"><i class="bi bi-gear"></i> Services de Domaine</h5>
+                            <p class="card-text">Tester les services métier</p>
+                            <a href="{{ path('services_index') }}" class="btn btn-success">Services</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title"><i class="bi bi-clock"></i> Gestion CRON</h5>
+                            <p class="card-text">Transitions automatiques des sorties</p>
+                            <a href="{{ path('cron_index') }}" class="btn btn-dark">CRON</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title"><i class="bi bi-map-fill"></i> Carte des Événements</h5>
+                            <p class="card-text">Visualiser tous les événements sur une carte</p>
+                            <a href="{{ path('events_map') }}" class="btn btn-primary">Voir la carte</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            -->
+
+            <div class="mt-4">
+                <a href="{{ path('home') }}" class="btn btn-secondary">Retour à l'accueil</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

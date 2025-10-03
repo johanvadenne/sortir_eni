@@ -1,0 +1,14 @@
+{% extends 'admin/edit_form.html.twig' %}
+
+{% set form_title = 'Modifier ' ~ site.nom %}
+{% set form_icon = 'building' %}
+{% set submit_button_text = 'Enregistrer' %}
+{% set cancel_url = path('admin_sites') %}
+
+{% block admin_form_fields %}
+    <div class="row">
+        <div class="col-12">
+            {{ form_row(form.nom, {'attr': {'class': 'form-control'}}) }}
+        </div>
+    </div>
+{% endblock %}

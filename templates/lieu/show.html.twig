@@ -1,0 +1,37 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ lieu.nom }}{% endblock %}
+
+{% block body %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h3>{{ lieu.nom }}</h3>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>Nom:</strong> {{ lieu.nom }}</p>
+                            <p><strong>Rue:</strong> {{ lieu.rue ?: 'Non renseignée' }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Ville:</strong> {{ lieu.ville.nom }} ({{ lieu.ville.codePostal }})</p>
+                            {% if lieu.latitude and lieu.longitude %}
+                                <p><strong>Coordonnées:</strong> {{ lieu.latitude }}, {{ lieu.longitude }}</p>
+                            {% else %}
+                                <p><strong>Coordonnées:</strong> Non renseignées</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <a href="{{ path('lieu_edit', {id: lieu.id}) }}" class="btn btn-warning">Modifier</a>
+                    <a href="{{ path('lieu_index') }}" class="btn btn-secondary">Retour</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

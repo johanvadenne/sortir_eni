@@ -1,0 +1,444 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Carte des Sorties{% endblock %}
+
+{% block body %}
+<div class="container-fluid mt-4">
+    <div class="row">
+        <!-- Sidebar avec filtres et liste -->
+        <div class="col-lg-4 col-xl-3">
+            <div class="card h-100">
+                <div class="card-header bg-primary text-white">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">
+                            <i class="bi bi-funnel me-2"></i>Filtres & Sorties
+                        </h5>
+                        <div class="btn-group" role="group">
+                            <input type="radio" class="btn-check" name="view-toggle" id="view-carte" value="carte"
+                                   {{ view == 'carte' ? 'checked' : '' }}>
+                            <label class="btn btn-outline-light btn-sm" for="view-carte" title="Vue carte">
+                                <i class="bi bi-map"></i>
+                            </label>
+
+                            <input type="radio" class="btn-check" name="view-toggle" id="view-liste" value="liste"
+                                   {{ view == 'liste' ? 'checked' : '' }}>
+                            <label class="btn btn-outline-light btn-sm" for="view-liste" title="Vue liste">
+                                <i class="bi bi-list"></i>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-body p-0">
+                    <!-- Filtres -->
+                    <div class="p-3 border-bottom">
+                        <form id="filters-form" method="get">
+                            <input type="hidden" name="view" value="{{ view }}">
+
+                            <div class="mb-3">
+                                <label for="etat" class="form-label">État</label>
+                                <select name="etat" id="etat" class="form-select form-select-sm">
+                                    <option value="">Tous les états</option>
+                                    <option value="Créée" {{ filters.etat == 'Créée' ? 'selected' : '' }}>Créée</option>
+                                    <option value="Ouverte" {{ filters.etat == 'Ouverte' ? 'selected' : '' }}>Ouverte</option>
+                                    <option value="Clôturée" {{ filters.etat == 'Clôturée' ? 'selected' : '' }}>Clôturée</option>
+                                    <option value="En cours" {{ filters.etat == 'En cours' ? 'selected' : '' }}>En cours</option>
+                                    <option value="Terminée" {{ filters.etat == 'Terminée' ? 'selected' : '' }}>Terminée</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="ville" class="form-label">Ville</label>
+                                <select name="ville" id="ville" class="form-select form-select-sm">
+                                    <option value="">Toutes les villes</option>
+                                    {% for ville in villes %}
+                                        <option value="{{ ville.id }}" {{ filters.ville == ville.id ? 'selected' : '' }}>
+                                            {{ ville.nom }} ({{ ville.codePostal }})
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="groupe" class="form-label">Groupe</label>
+                                <select name="groupe" id="groupe" class="form-select form-select-sm">
+                                    <option value="">Tous les groupes</option>
+                                    <option value="public" {{ filters.groupe == 'public' ? 'selected' : '' }}>Sorties publiques</option>
+                                    {% for groupe in groupes %}
+                                        <option value="{{ groupe.id }}" {{ filters.groupe == groupe.id ? 'selected' : '' }}>
+                                            {{ groupe.nom }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-6">
+                                    <div class="mb-3">
+                                        <label for="date_debut" class="form-label">Date début</label>
+                                        <input type="date" name="date_debut" id="date_debut" class="form-control form-control-sm"
+                                               value="{{ filters.date_debut }}">
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="mb-3">
+                                        <label for="date_fin" class="form-label">Date fin</label>
+                                        <input type="date" name="date_fin" id="date_fin" class="form-control form-control-sm"
+                                               value="{{ filters.date_fin }}">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="d-grid gap-2">
+                                <button type="submit" class="btn btn-primary btn-sm">
+                                    <i class="bi bi-search me-1"></i>Filtrer
+                                </button>
+                                <a href="{{ path('sortie_map_index') }}" class="btn btn-outline-secondary btn-sm">
+                                    <i class="bi bi-arrow-clockwise me-1"></i>Réinitialiser
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Liste des sorties -->
+                    <div id="sorties-list" class="p-3" style="max-height: 60vh; overflow-y: auto;">
+                        <div id="sorties-container">
+                            <!-- Le contenu sera chargé dynamiquement -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Zone principale : Carte ou liste -->
+        <div class="col-lg-8 col-xl-9">
+            <div class="card h-100">
+                <div class="card-header bg-success text-white">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">
+                            <i class="bi bi-geo-alt me-2"></i>
+                            <span id="view-title">Carte des Sorties</span>
+                        </h5>
+                        <div class="btn-group" role="group">
+                            <button type="button" class="btn btn-outline-light btn-sm" id="add-lieu-btn" title="Ajouter un lieu">
+                                <i class="bi bi-plus-circle"></i>
+                            </button>
+                            <button type="button" class="btn btn-outline-light btn-sm" id="geolocation-btn" title="Ma position">
+                                <i class="bi bi-geo-alt"></i>
+                            </button>
+                            <button type="button" class="btn btn-outline-light btn-sm" id="fullscreen-btn" title="Plein écran">
+                                <i class="bi bi-fullscreen"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-body p-0">
+                    <!-- Vue carte -->
+                    <div id="map-view" class="{{ view == 'carte' ? '' : 'd-none' }}">
+                        <div id="sortie-map" style="height: 70vh; width: 100%;"></div>
+                    </div>
+
+                    <!-- Vue liste -->
+                    <div id="list-view" class="{{ view == 'liste' ? '' : 'd-none' }}">
+                        <div class="p-3">
+                            <div id="sorties-grid">
+                                <!-- Le contenu sera chargé dynamiquement -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal pour ajouter un lieu -->
+<div class="modal fade" id="add-lieu-modal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="bi bi-plus-circle me-2"></i>Ajouter un nouveau lieu
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div id="lieu-form-container">
+                    <!-- Le formulaire sera chargé ici -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="{{ asset('assets/js/map.js') }}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            let sortieMap = null;
+            let selectedLocation = null;
+            let currentView = '{{ view }}';
+
+            // Initialiser la carte
+            initMap();
+
+            // Gérer le toggle de vue
+            document.querySelectorAll('input[name="view-toggle"]').forEach(radio => {
+                radio.addEventListener('change', function() {
+                    currentView = this.value;
+                    toggleView(currentView);
+                });
+            });
+
+            // Gérer les filtres
+            document.getElementById('filters-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                loadSorties();
+            });
+
+            // Bouton ajouter lieu
+            document.getElementById('add-lieu-btn').addEventListener('click', function() {
+                showAddLieuModal();
+            });
+
+            // Bouton géolocalisation
+            document.getElementById('geolocation-btn').addEventListener('click', function() {
+                if (sortieMap) {
+                    sortieMap.addGeolocationControl();
+                }
+            });
+
+            // Bouton plein écran
+            document.getElementById('fullscreen-btn').addEventListener('click', function() {
+                const mapContainer = document.getElementById('sortie-map');
+                mapContainer.classList.toggle('fullscreen');
+                if (sortieMap) {
+                    setTimeout(() => {
+                        sortieMap.map.invalidateSize();
+                    }, 100);
+                }
+            });
+
+            function initMap() {
+                if (currentView === 'carte') {
+                    try {
+                        sortieMap = new SortirMap('sortie-map', {
+                            center: [47.2184, -1.5536], // Nantes
+                            zoom: 10
+                        });
+
+                        // Surcharger la méthode onLocationSelected pour ajouter des lieux
+                        sortieMap.onLocationSelected = function(lat, lng) {
+                            selectedLocation = { lat, lng };
+                            showAddLieuModal(lat, lng);
+                        };
+
+                        loadSorties();
+                    } catch (error) {
+                        console.error('Erreur lors de l\'initialisation de la carte:', error);
+                    }
+                } else {
+                    loadSorties();
+                }
+            }
+
+            function toggleView(view) {
+                const mapView = document.getElementById('map-view');
+                const listView = document.getElementById('list-view');
+                const viewTitle = document.getElementById('view-title');
+
+                if (view === 'carte') {
+                    mapView.classList.remove('d-none');
+                    listView.classList.add('d-none');
+                    viewTitle.textContent = 'Carte des Sorties';
+
+                    // Initialiser la carte si pas encore fait
+                    if (!sortieMap) {
+                        setTimeout(initMap, 100);
+                    }
+                } else {
+                    mapView.classList.add('d-none');
+                    listView.classList.remove('d-none');
+                    viewTitle.textContent = 'Liste des Sorties';
+                }
+
+                // Mettre à jour l'URL
+                const url = new URL(window.location);
+                url.searchParams.set('view', view);
+                window.history.pushState({}, '', url);
+            }
+
+            function loadSorties() {
+                const formData = new FormData(document.getElementById('filters-form'));
+                const params = new URLSearchParams();
+
+                for (let [key, value] of formData.entries()) {
+                    if (value) params.append(key, value);
+                }
+
+                // Afficher le spinner
+                document.getElementById('sorties-container').innerHTML = `
+                    <div class="text-center">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Chargement...</span>
+                        </div>
+                    </div>
+                `;
+
+                fetch(`{{ path('sortie_map_api_sorties') }}?${params.toString()}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        displaySorties(data);
+
+                        if (currentView === 'carte' && sortieMap) {
+                            displaySortiesOnMap(data);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Erreur lors du chargement des sorties:', error);
+                        document.getElementById('sorties-container').innerHTML = `
+                            <div class="alert alert-danger">
+                                <i class="bi bi-exclamation-triangle"></i>
+                                Erreur lors du chargement des données
+                            </div>
+                        `;
+                    });
+            }
+
+            function displaySorties(sorties) {
+                const container = document.getElementById('sorties-container');
+
+                if (sorties.length === 0) {
+                    container.innerHTML = `
+                        <div class="alert alert-info text-center">
+                            <i class="bi bi-info-circle fa-2x mb-3"></i>
+                            <h6>Aucune sortie trouvée</h6>
+                            <p class="mb-0">Aucune sortie ne correspond à vos critères de recherche.</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                let html = `<div class="mb-2"><strong>${sorties.length} sortie(s) trouvée(s)</strong></div>`;
+
+                sorties.forEach(sortie => {
+                    const date = new Date(sortie.dateHeureDebut).toLocaleDateString('fr-FR', {
+                        weekday: 'short',
+                        day: 'numeric',
+                        month: 'short',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    });
+
+                    html += `
+                        <div class="card mb-2 sortie-item" data-sortie-id="${sortie.id}">
+                            <div class="card-body p-2">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div class="flex-grow-1">
+                                        <h6 class="card-title mb-1">${sortie.nom}</h6>
+                                        <p class="card-text mb-1">
+                                            <small class="text-muted">
+                                                <i class="bi bi-calendar me-1"></i>${date}
+                                            </small>
+                                        </p>
+                                        <p class="card-text mb-1">
+                                            <small class="text-muted">
+                                                <i class="bi bi-geo-alt me-1"></i>${sortie.lieu}
+                                            </small>
+                                        </p>
+                                        ${sortie.groupe ? `
+                                            <p class="card-text mb-1">
+                                                <small class="text-info">
+                                                    <i class="bi bi-people me-1"></i>${sortie.groupe.nom}
+                                                </small>
+                                            </p>
+                                        ` : ''}
+                                    </div>
+                                    <div class="text-end">
+                                        <span class="badge bg-${getStatusColor(sortie.etat)} mb-1">${sortie.etat}</span>
+                                        <br>
+                                        <small class="text-muted">${sortie.nbInscriptionsActuelles}/${sortie.nbInscriptionsMax}</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                container.innerHTML = html;
+
+                // Ajouter les événements de clic
+                document.querySelectorAll('.sortie-item').forEach(item => {
+                    item.addEventListener('click', function() {
+                        const sortieId = this.dataset.sortieId;
+                        window.location.href = `/sorties/${sortieId}`;
+                    });
+                });
+            }
+
+            function displaySortiesOnMap(sorties) {
+                if (!sortieMap) return;
+
+                // Effacer les marqueurs existants
+                sortieMap.clearAllMarkers();
+
+                // Ajouter les nouveaux marqueurs
+                sorties.forEach(sortie => {
+                    sortieMap.addEventMarker(sortie);
+                });
+
+                // Ajuster la vue si nécessaire
+                if (sorties.length > 0) {
+                    const bounds = L.latLngBounds(sorties.map(s => [s.latitude, s.longitude]));
+                    sortieMap.fitBounds(bounds);
+                }
+            }
+
+            function showAddLieuModal(lat = null, lng = null) {
+                const modal = new bootstrap.Modal(document.getElementById('add-lieu-modal'));
+
+                // Charger le formulaire
+                fetch('{{ path('sortie_map_lieu_new') }}', {
+                    method: 'GET',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                .then(response => response.text())
+                .then(html => {
+                    document.getElementById('lieu-form-container').innerHTML = html;
+
+                    // Pré-remplir les coordonnées si fournies
+                    if (lat && lng) {
+                        document.getElementById('lieu_latitude').value = lat.toFixed(6);
+                        document.getElementById('lieu_longitude').value = lng.toFixed(6);
+                    }
+
+                    modal.show();
+                })
+                .catch(error => {
+                    console.error('Erreur lors du chargement du formulaire:', error);
+                });
+            }
+
+            function getStatusColor(status) {
+                const colors = {
+                    'Créée': 'secondary',
+                    'Ouverte': 'success',
+                    'Clôturée': 'warning',
+                    'En cours': 'primary',
+                    'Terminée': 'info',
+                    'Annulée': 'danger',
+                    'Historisée': 'dark'
+                };
+                return colors[status] || 'secondary';
+            }
+
+            // Charger les sorties au démarrage
+            loadSorties();
+        });
+    </script>
+{% endblock %}

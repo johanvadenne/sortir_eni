@@ -1,0 +1,100 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Workflow des Sorties{% endblock %}
+
+{% block body %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-12">
+            <h1>Workflow des Sorties</h1>
+
+            <div class="mb-4">
+                <a href="{{ path('workflow_create_test') }}" class="btn btn-primary">Créer une sortie de test</a>
+                <a href="{{ path('workflow_process_automatic') }}" class="btn btn-info">Traiter les transitions automatiques</a>
+                <a href="{{ path('workflow_test_scenarios') }}" class="btn btn-success">Tester les scénarios</a>
+            </div>
+
+            {% if sorties is empty %}
+                <div class="alert alert-info">
+                    <p>Aucune sortie trouvée. Créez une sortie de test pour commencer.</p>
+                </div>
+            {% else %}
+                {% for sortieData in sorties %}
+                    {% set sortie = sortieData.sortie %}
+                    <div class="card mb-4">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5>{{ sortie.nom }}</h5>
+                            <span class="badge bg-{{
+                                sortieData.currentState == 'cree' ? 'secondary' :
+                                sortieData.currentState == 'ouverte' ? 'success' :
+                                sortieData.currentState == 'cloturee' ? 'warning' :
+                                sortieData.currentState == 'en_cours' ? 'primary' :
+                                sortieData.currentState == 'terminee' ? 'info' :
+                                sortieData.currentState == 'annulee' ? 'danger' :
+                                'dark'
+                            }}">
+                                {{ sortie.etat.libelle }}
+                            </span>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p><strong>Date de début:</strong> {{ sortie.dateHeureDebut|date('d/m/Y H:i') }}</p>
+                                    <p><strong>Date limite inscription:</strong> {{ sortie.dateLimiteInscription|date('d/m/Y H:i') }}</p>
+                                    <p><strong>Inscriptions:</strong> {{ sortie.nbInscriptionsActuelles }}/{{ sortie.nbInscriptionsMax }}</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p><strong>État workflow:</strong> {{ sortieData.currentState }}</p>
+                                    <p><strong>Organisateur:</strong> {{ sortie.organisateur.pseudo }}</p>
+                                    <p><strong>Lieu:</strong> {{ sortie.lieu.nom }}</p>
+                                </div>
+                            </div>
+
+                            <h6>Transitions possibles:</h6>
+                            <div class="btn-group" role="group">
+                                {% if sortieData.canPublier %}
+                                    <a href="{{ path('workflow_transition', {id: sortie.id, transition: 'publier'}) }}"
+                                       class="btn btn-sm btn-success">Publier</a>
+                                {% endif %}
+
+                                {% if sortieData.canCloreAuto %}
+                                    <a href="{{ path('workflow_transition', {id: sortie.id, transition: 'clore_auto'}) }}"
+                                       class="btn btn-sm btn-warning">Clôturer</a>
+                                {% endif %}
+
+                                {% if sortieData.canLancer %}
+                                    <a href="{{ path('workflow_transition', {id: sortie.id, transition: 'lancer'}) }}"
+                                       class="btn btn-sm btn-primary">Lancer</a>
+                                {% endif %}
+
+                                {% if sortieData.canTerminer %}
+                                    <a href="{{ path('workflow_transition', {id: sortie.id, transition: 'terminer'}) }}"
+                                       class="btn btn-sm btn-info">Terminer</a>
+                                {% endif %}
+
+                                {% if sortieData.canAnnuler %}
+                                    <a href="{{ path('workflow_transition', {id: sortie.id, transition: 'annuler'}) }}"
+                                       class="btn btn-sm btn-danger">Annuler</a>
+                                {% endif %}
+
+                                {% if sortieData.canArchiver %}
+                                    <a href="{{ path('workflow_transition', {id: sortie.id, transition: 'archiver'}) }}"
+                                       class="btn btn-sm btn-dark">Archiver</a>
+                                {% endif %}
+                            </div>
+
+                            {% if sortieData.enabledTransitions is empty %}
+                                <p class="text-muted mt-2">Aucune transition disponible</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            <div class="mt-4">
+                <a href="{{ path('admin_dashboard') }}" class="btn btn-secondary">Retour à l'administration</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

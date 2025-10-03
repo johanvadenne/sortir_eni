@@ -1,0 +1,190 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ groupe.nom }}{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <!-- En-tête du groupe -->
+            <div class="card shadow mb-4">
+                <div class="card-header bg-primary text-white">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h1 class="h3 mb-0">
+                                <i class="fas fa-users me-2"></i>{{ groupe.nom }}
+                            </h1>
+                            {% if groupe.description %}
+                                <p class="mb-0 mt-2 opacity-75">{{ groupe.description }}</p>
+                            {% endif %}
+                        </div>
+                        <div class="text-end">
+                            {% if can_edit %}
+                                <a href="{{ path('groupe_edit', {'id': groupe.id}) }}" class="btn btn-light btn-sm me-2">
+                                    <i class="fas fa-edit me-1"></i>Modifier
+                                </a>
+                            {% endif %}
+                            {% if can_manage_members %}
+                                <a href="{{ path('groupe_membres', {'id': groupe.id}) }}" class="btn btn-light btn-sm">
+                                    <i class="fas fa-users me-1"></i>Gérer les membres
+                                </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-md-3">
+                            <div class="border-end">
+                                <h4 class="text-primary mb-1">{{ groupe.nbParticipants }}</h4>
+                                <small class="text-muted">Membres</small>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="border-end">
+                                <h4 class="text-success mb-1">{{ groupe.nbSorties }}</h4>
+                                <small class="text-muted">Sorties</small>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="border-end">
+                                <h4 class="text-info mb-1">{{ groupe.createur.prenom }} {{ groupe.createur.nom }}</h4>
+                                <small class="text-muted">Créateur</small>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <h4 class="text-warning mb-1">{{ groupe.dateCreation|date('d/m/Y') }}</h4>
+                            <small class="text-muted">Créé le</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <!-- Membres du groupe -->
+                <div class="col-md-6 mb-4">
+                    <div class="card h-100">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">
+                                <i class="fas fa-users me-2"></i>Membres ({{ groupe.nbParticipants }})
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            {% if groupe.participants is empty %}
+                                <p class="text-muted text-center">Aucun membre dans ce groupe.</p>
+                            {% else %}
+                                <div class="list-group list-group-flush">
+                                    {% for participant in groupe.participants %}
+                                        <div class="list-group-item d-flex justify-content-between align-items-center px-0">
+                                            <div class="d-flex align-items-center">
+                                                {% if participant.photoProfil %}
+                                                    <img src="{{ asset('uploads/profiles/' ~ participant.photoProfil) }}"
+                                                         alt="Photo de {{ participant.pseudo }}"
+                                                         class="rounded-circle me-3"
+                                                         style="width: 40px; height: 40px; object-fit: cover;">
+                                                {% else %}
+                                                    <div class="bg-secondary rounded-circle me-3 d-flex align-items-center justify-content-center"
+                                                         style="width: 40px; height: 40px;">
+                                                        <i class="fas fa-user text-white"></i>
+                                                    </div>
+                                                {% endif %}
+                                                <div>
+                                                    <strong>{{ participant.prenom }} {{ participant.nom }}</strong>
+                                                    <br>
+                                                    <small class="text-muted">@{{ participant.pseudo }}</small>
+                                                </div>
+                                            </div>
+                                            {% if participant == groupe.createur %}
+                                                <span class="badge bg-primary">Créateur</span>
+                                            {% endif %}
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="card-footer">
+                            <a href="{{ path('groupe_membres', {'id': groupe.id}) }}" class="btn btn-outline-primary btn-sm">
+                                <i class="fas fa-users me-1"></i>Voir tous les membres
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sorties du groupe -->
+                <div class="col-md-6 mb-4">
+                    <div class="card h-100">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">
+                                <i class="fas fa-calendar-alt me-2"></i>Sorties ({{ groupe.nbSorties }})
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            {% if groupe.sorties is empty %}
+                                <p class="text-muted text-center">Aucune sortie organisée dans ce groupe.</p>
+                            {% else %}
+                                <div class="list-group list-group-flush">
+                                    {% for sortie in groupe.sorties|slice(0, 5) %}
+                                        <div class="list-group-item px-0">
+                                            <div class="d-flex justify-content-between align-items-start">
+                                                <div>
+                                                    <h6 class="mb-1">{{ sortie.nom }}</h6>
+                                                    <p class="mb-1 text-muted">
+                                                        <i class="fas fa-calendar me-1"></i>{{ sortie.dateHeureDebut|date('d/m/Y H:i') }}
+                                                    </p>
+                                                    <small class="text-muted">
+                                                        <i class="fas fa-map-marker-alt me-1"></i>{{ sortie.lieu.nom }}
+                                                    </small>
+                                                </div>
+                                                <span class="badge bg-{{ sortie.etat.libelle == 'Ouverte' ? 'success' : (sortie.etat.libelle == 'Clôturée' ? 'warning' : 'secondary') }}">
+                                                    {{ sortie.etat.libelle }}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="card-footer">
+                            <a href="{{ path('sortie_index') }}?groupe={{ groupe.id }}" class="btn btn-outline-primary btn-sm">
+                                <i class="fas fa-calendar-alt me-1"></i>Voir toutes les sorties
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="row">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h5 class="card-title mb-0">Actions</h5>
+                                    <p class="text-muted mb-0">Gérez votre participation au groupe</p>
+                                </div>
+                                <div>
+                                    {% if groupe.isMembre(user) %}
+                                        {% if groupe.createur != user %}
+                                            <form method="post" action="{{ path('groupe_leave', {'id': groupe.id}) }}" class="d-inline">
+                                                <button type="submit" class="btn btn-outline-danger"
+                                                        onclick="return confirm('Êtes-vous sûr de vouloir quitter ce groupe ?')">
+                                                    <i class="fas fa-sign-out-alt me-1"></i>Quitter le groupe
+                                                </button>
+                                            </form>
+                                        {% endif %}
+                                    {% else %}
+                                        <a href="{{ path('groupe_membres', {'id': groupe.id}) }}" class="btn btn-primary">
+                                            <i class="fas fa-user-plus me-1"></i>Rejoindre le groupe
+                                        </a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

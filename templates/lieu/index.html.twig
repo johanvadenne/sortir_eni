@@ -1,0 +1,66 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Gestion des Lieux{% endblock %}
+
+{% block body %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-12">
+            <h1>Gestion des Lieux</h1>
+
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <a href="{{ path('lieu_new') }}" class="btn btn-primary">Ajouter un lieu</a>
+            </div>
+
+            <div class="card">
+                <div class="card-body">
+                    {% if lieux is empty %}
+                        <p class="text-muted">Aucun lieu trouvé.</p>
+                    {% else %}
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Nom</th>
+                                        <th>Rue</th>
+                                        <th>Ville</th>
+                                        <th>Coordonnées</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for lieu in lieux %}
+                                        <tr>
+                                            <td>{{ lieu.nom }}</td>
+                                            <td>{{ lieu.rue ?: 'Non renseignée' }}</td>
+                                            <td>{{ lieu.ville.nom }} ({{ lieu.ville.codePostal }})</td>
+                                            <td>
+                                                {% if lieu.latitude and lieu.longitude %}
+                                                    {{ lieu.latitude }}, {{ lieu.longitude }}
+                                                {% else %}
+                                                    Non renseignées
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                <a href="{{ path('lieu_show', {id: lieu.id}) }}" class="btn btn-sm btn-info">Voir</a>
+                                                <a href="{{ path('lieu_edit', {id: lieu.id}) }}" class="btn btn-sm btn-warning">Modifier</a>
+                                                <form method="post" action="{{ path('lieu_delete', {id: lieu.id}) }}" class="d-inline" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce lieu ?')">
+                                                    <button type="submit" class="btn btn-sm btn-danger">Supprimer</button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="mt-4">
+                <a href="{{ path('admin_dashboard') }}" class="btn btn-secondary">Retour à l'administration</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

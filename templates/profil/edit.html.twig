@@ -1,0 +1,100 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Modifier mon Profil{% endblock %}
+
+{% block main_class %}py-4{% endblock %}
+
+{% block body %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <!-- Affichage des messages flash -->
+            {% for type, messages in app.flashes %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ type == 'error' ? 'danger' : type }} alert-dismissible fade show" role="alert">
+                        <div class="d-flex align-items-center">
+                            {% if type == 'success' %}
+                                <i class="fas fa-check-circle me-2"></i>
+                            {% elseif type == 'error' %}
+                                <i class="fas fa-exclamation-triangle me-2"></i>
+                            {% elseif type == 'warning' %}
+                                <i class="fas fa-exclamation-circle me-2"></i>
+                            {% else %}
+                                <i class="fas fa-info-circle me-2"></i>
+                            {% endif %}
+                            <span>{{ message }}</span>
+                        </div>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endfor %}
+            {% include 'form/base_form.html.twig' with {
+                'form_title': 'Modifier mon Profil',
+                'form_icon': 'person-gear',
+                'submit_button_text': 'Enregistrer',
+                'cancel_url': path('profil_show')
+            } %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block form_fields %}
+    <div class="row">
+        <div class="col-md-6">
+            {{ form_row(form.pseudo, {'attr': {'class': 'form-control'}}) }}
+        </div>
+        <div class="col-md-6">
+            {{ form_row(form.nom, {'attr': {'class': 'form-control'}}) }}
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            {{ form_row(form.prenom, {'attr': {'class': 'form-control'}}) }}
+        </div>
+        <div class="col-md-6">
+            {{ form_row(form.telephone, {'attr': {'class': 'form-control'}}) }}
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            {{ form_row(form.mail, {'attr': {'class': 'form-control'}}) }}
+        </div>
+        <div class="col-md-6">
+            {{ form_row(form.site, {'attr': {'class': 'form-select'}}) }}
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="mb-3">
+                <label class="form-label">Photo de profil actuelle</label>
+                <div class="d-flex align-items-center">
+                    {% if participant.photoProfil %}
+                        <img src="{{ participant.photoProfil }}" alt="Photo de profil actuelle" class="rounded-circle me-3" style="width: 80px; height: 80px; object-fit: cover;">
+                        <div>
+                            <p class="mb-1 text-muted">Photo actuelle</p>
+                            <small class="text-muted">Téléchargez une nouvelle photo pour la remplacer</small>
+                        </div>
+                    {% else %}
+                        <div class="rounded-circle me-3 d-flex align-items-center justify-content-center bg-secondary text-white" style="width: 80px; height: 80px; font-size: 24px; font-weight: bold;">
+                            {{ participant.prenom|first|upper }}{{ participant.nom|first|upper }}
+                        </div>
+                        <div>
+                            <p class="mb-1 text-muted">Aucune photo de profil</p>
+                            <small class="text-muted">Téléchargez une photo pour personnaliser votre profil</small>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            {{ form_row(form.photoProfil, {'attr': {'class': 'form-control'}}) }}
+        </div>
+    </div>
+{% endblock %}

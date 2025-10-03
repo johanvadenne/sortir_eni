@@ -1,0 +1,25 @@
+# Configuration Docker pour l'application Sortir
+
+# Environnement
+APP_ENV=prod
+APP_SECRET=your_super_secret_key_here_change_this_in_production
+
+# Base de données MySQL
+MYSQL_ROOT_PASSWORD=rootpassword
+MYSQL_DATABASE=sortir
+MYSQL_USER=sortir_user
+MYSQL_PASSWORD=sortir_password
+
+# URL de la base de données (générée automatiquement)
+DATABASE_URL=mysql://sortir_user:sortir_password@database:3306/sortir?serverVersion=8.0
+
+# Configuration du serveur
+TRUSTED_PROXIES=127.0.0.1,REMOTE_ADDR
+TRUSTED_HOSTS='^localhost$'
+
+# Configuration des logs
+MAILER_DSN=null://null
+
+# Configuration de sécurité
+CORS_ALLOW_ORIGIN='^https?://(localhost|127\.0\.0\.1)(:[0-9]+)?$'
+

@@ -1,0 +1,8 @@
+{% extends 'sortie/form.html.twig' %}
+
+{% set form_title = 'Modifier ' ~ sortie.nom %}
+{% set submit_button_text = 'Enregistrer' %}
+{% set cancel_url = path('sortie_show', {id: sortie.id}) %}
+
+{# Passer les villes au template parent #}
+{% set villes = villes %}

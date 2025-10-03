@@ -1,0 +1,46 @@
+framework:
+    workflows:
+        sortie_workflow:
+            type: 'state_machine'
+            audit_trail:
+                enabled: true
+            marking_store:
+                type: 'method'
+                property: 'etatLibelle'
+            supports:
+                - App\Entity\Sortie
+            initial_marking: Créée
+            places:
+                - Créée
+                - Ouverte
+                - Clôturée
+                - En cours
+                - Terminée
+                - Annulée
+                - Historisée
+            transitions:
+                publier:
+                    from: Créée
+                    to: Ouverte
+                    guard: 'is_granted("ROLE_USER") and subject.getOrganisateur() == user or is_granted("ROLE_ADMIN")'
+
+                clore_auto:
+                    from: Ouverte
+                    to: Clôturée
+
+                lancer:
+                    from: Clôturée
+                    to: En cours
+
+                terminer:
+                    from: En cours
+                    to: Terminée
+
+                annuler:
+                    from: [Ouverte, Clôturée]
+                    to: Annulée
+                    guard: 'is_granted("ROLE_USER") and (subject.getOrganisateur() == user or is_granted("ROLE_ADMIN"))'
+
+                archiver:
+                    from: Terminée
+                    to: Historisée

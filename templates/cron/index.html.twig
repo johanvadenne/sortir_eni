@@ -1,0 +1,170 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Gestion CRON - Transitions Automatiques{% endblock %}
+
+{% block body %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-12">
+            <h1>Gestion CRON - Transitions Automatiques</h1>
+
+            <div class="alert alert-info">
+                <h5>Heure actuelle : {{ now|date('d/m/Y H:i:s') }}</h5>
+                <p>Cette page permet de visualiser et tester les transitions automatiques des sorties.</p>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h4>Actions</h4>
+                        </div>
+                        <div class="card-body">
+                            <a href="{{ path('cron_simulate') }}" class="btn btn-info mb-2 w-100">Simuler les transitions</a>
+                            <a href="{{ path('cron_execute') }}" class="btn btn-success mb-2 w-100" onclick="return confirm('Êtes-vous sûr de vouloir exécuter les transitions ?')">Exécuter les transitions</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h4>Configuration CRON</h4>
+                        </div>
+                        <div class="card-body">
+                            <p><strong>Commande :</strong></p>
+                            <code>*/5 * * * * cd /chemin/vers/projet && php bin/console app:sortie:tick</code>
+                            <p class="mt-2"><small>Exécution toutes les 5 minutes</small></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mt-4">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5>Ouverte → Clôturée</h5>
+                        </div>
+                        <div class="card-body">
+                            <p><strong>Conditions :</strong></p>
+                            <ul>
+                                <li>Nombre max d'inscriptions atteint</li>
+                                <li>Date limite d'inscription dépassée</li>
+                            </ul>
+                            <p><strong>Sorties concernées :</strong> {{ analysis.ouverte_to_cloturee|length }}</p>
+
+                            {% if analysis.ouverte_to_cloturee is not empty %}
+                                <div class="mt-3">
+                                    <h6>Sorties à clôturer :</h6>
+                                    <ul class="list-group">
+                                        {% for data in analysis.ouverte_to_cloturee %}
+                                            <li class="list-group-item">
+                                                <strong>{{ data.sortie.nom }}</strong><br>
+                                                <small class="text-muted">{{ data.reason }}</small>
+                                            </li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5>Clôturée → Activité en cours</h5>
+                        </div>
+                        <div class="card-body">
+                            <p><strong>Conditions :</strong></p>
+                            <ul>
+                                <li>Date de début de la sortie atteinte</li>
+                            </ul>
+                            <p><strong>Sorties concernées :</strong> {{ analysis.cloturee_to_en_cours|length }}</p>
+
+                            {% if analysis.cloturee_to_en_cours is not empty %}
+                                <div class="mt-3">
+                                    <h6>Sorties à démarrer :</h6>
+                                    <ul class="list-group">
+                                        {% for sortie in analysis.cloturee_to_en_cours %}
+                                            <li class="list-group-item">
+                                                <strong>{{ sortie.nom }}</strong><br>
+                                                <small class="text-muted">Début : {{ sortie.dateHeureDebut|date('d/m/Y H:i') }}</small>
+                                            </li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mt-4">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5>Activité en cours → Activité terminée</h5>
+                        </div>
+                        <div class="card-body">
+                            <p><strong>Conditions :</strong></p>
+                            <ul>
+                                <li>Durée de la sortie écoulée (si définie)</li>
+                            </ul>
+                            <p><strong>Sorties concernées :</strong> {{ analysis.en_cours_to_terminee|length }}</p>
+
+                            {% if analysis.en_cours_to_terminee is not empty %}
+                                <div class="mt-3">
+                                    <h6>Sorties à terminer :</h6>
+                                    <ul class="list-group">
+                                        {% for sortie in analysis.en_cours_to_terminee %}
+                                            <li class="list-group-item">
+                                                <strong>{{ sortie.nom }}</strong><br>
+                                                <small class="text-muted">Durée : {{ sortie.duree }} minutes</small>
+                                            </li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5>Activité terminée → Activité historisée</h5>
+                        </div>
+                        <div class="card-body">
+                            <p><strong>Conditions :</strong></p>
+                            <ul>
+                                <li>1 mois après la date de début</li>
+                            </ul>
+                            <p><strong>Sorties concernées :</strong> {{ analysis.terminee_to_historisee|length }}</p>
+
+                            {% if analysis.terminee_to_historisee is not empty %}
+                                <div class="mt-3">
+                                    <h6>Sorties à historiser :</h6>
+                                    <ul class="list-group">
+                                        {% for sortie in analysis.terminee_to_historisee %}
+                                            <li class="list-group-item">
+                                                <strong>{{ sortie.nom }}</strong><br>
+                                                <small class="text-muted">Début : {{ sortie.dateHeureDebut|date('d/m/Y H:i') }}</small>
+                                            </li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-4">
+                <a href="{{ path('admin_dashboard') }}" class="btn btn-secondary">Retour à l'administration</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

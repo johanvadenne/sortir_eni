@@ -1,0 +1,445 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Gestion des Participants{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        /* Amélioration de la visibilité des erreurs */
+        .is-invalid {
+            border-color: #dc3545 !important;
+            box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25) !important;
+        }
+
+        .invalid-feedback {
+            display: block !important;
+            color: #dc3545;
+            font-weight: 500;
+            margin-top: 0.25rem;
+        }
+
+        .invalid-feedback .fas {
+            color: #dc3545;
+        }
+
+        /* Alerte d'erreur plus visible */
+        .alert-danger {
+            border-left: 4px solid #dc3545;
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+        }
+
+        .alert-danger .alert-heading {
+            color: #721c24;
+            font-weight: 600;
+        }
+
+        /* Animation pour attirer l'attention */
+        .is-invalid {
+            animation: shake 0.5s ease-in-out;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        /* Mise en évidence des champs avec erreurs */
+        .form-control.is-invalid:focus {
+            border-color: #dc3545;
+            box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+        }
+
+        /* Styles pour les photos de profil dans le tableau */
+        .table td:first-child {
+            width: 60px;
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        .table img.rounded-circle {
+            border: 2px solid #dee2e6;
+            transition: border-color 0.3s ease;
+        }
+
+        .table img.rounded-circle:hover {
+            border-color: #007bff;
+        }
+
+        .table .rounded-circle {
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+    </style>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Validation en temps réel pour le pseudo
+            const pseudoInput = document.querySelector('input[name="admin_participant[pseudo]"]');
+            if (pseudoInput) {
+                pseudoInput.addEventListener('blur', function() {
+                    const pseudo = this.value.trim();
+                    if (pseudo.length > 0 && pseudo.length < 3) {
+                        this.classList.add('is-invalid');
+                        let feedback = this.parentNode.querySelector('.invalid-feedback');
+                        if (!feedback) {
+                            feedback = document.createElement('div');
+                            feedback.className = 'invalid-feedback';
+                            this.parentNode.appendChild(feedback);
+                        }
+                        feedback.innerHTML = '<div class="d-flex align-items-center"><i class="fas fa-exclamation-circle me-2"></i><span>Le pseudo doit contenir au moins 3 caractères</span></div>';
+                    } else if (pseudo.length >= 3) {
+                        this.classList.remove('is-invalid');
+                        const feedback = this.parentNode.querySelector('.invalid-feedback');
+                        if (feedback) {
+                            feedback.remove();
+                        }
+                    }
+                });
+            }
+
+            // Validation en temps réel pour l'email
+            const emailInput = document.querySelector('input[name="admin_participant[mail]"]');
+            if (emailInput) {
+                emailInput.addEventListener('blur', function() {
+                    const email = this.value.trim();
+                    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                    if (email.length > 0 && !emailRegex.test(email)) {
+                        this.classList.add('is-invalid');
+                        let feedback = this.parentNode.querySelector('.invalid-feedback');
+                        if (!feedback) {
+                            feedback = document.createElement('div');
+                            feedback.className = 'invalid-feedback';
+                            this.parentNode.appendChild(feedback);
+                        }
+                        feedback.innerHTML = '<div class="d-flex align-items-center"><i class="fas fa-exclamation-circle me-2"></i><span>L\'adresse email n\'est pas valide</span></div>';
+                    } else if (emailRegex.test(email)) {
+                        this.classList.remove('is-invalid');
+                        const feedback = this.parentNode.querySelector('.invalid-feedback');
+                        if (feedback) {
+                            feedback.remove();
+                        }
+                    }
+                });
+            }
+
+            // Validation des mots de passe
+            const passwordInput = document.querySelector('input[name="admin_participant[plainPassword][first]"]');
+            const confirmPasswordInput = document.querySelector('input[name="admin_participant[plainPassword][second]"]');
+
+            if (passwordInput && confirmPasswordInput) {
+                function validatePasswords() {
+                    const password = passwordInput.value;
+                    const confirmPassword = confirmPasswordInput.value;
+
+                    if (password.length > 0 && password.length < 6) {
+                        passwordInput.classList.add('is-invalid');
+                        let feedback = passwordInput.parentNode.querySelector('.invalid-feedback');
+                        if (!feedback) {
+                            feedback = document.createElement('div');
+                            feedback.className = 'invalid-feedback';
+                            passwordInput.parentNode.appendChild(feedback);
+                        }
+                        feedback.innerHTML = '<div class="d-flex align-items-center"><i class="fas fa-exclamation-circle me-2"></i><span>Le mot de passe doit contenir au moins 6 caractères</span></div>';
+                    } else if (password.length >= 6) {
+                        passwordInput.classList.remove('is-invalid');
+                        const feedback = passwordInput.parentNode.querySelector('.invalid-feedback');
+                        if (feedback) {
+                            feedback.remove();
+                        }
+                    }
+
+                    if (confirmPassword.length > 0 && password !== confirmPassword) {
+                        confirmPasswordInput.classList.add('is-invalid');
+                        let feedback = confirmPasswordInput.parentNode.querySelector('.invalid-feedback');
+                        if (!feedback) {
+                            feedback = document.createElement('div');
+                            feedback.className = 'invalid-feedback';
+                            confirmPasswordInput.parentNode.appendChild(feedback);
+                        }
+                        feedback.innerHTML = '<div class="d-flex align-items-center"><i class="fas fa-exclamation-circle me-2"></i><span>Les mots de passe ne correspondent pas</span></div>';
+                    } else if (password === confirmPassword && confirmPassword.length > 0) {
+                        confirmPasswordInput.classList.remove('is-invalid');
+                        const feedback = confirmPasswordInput.parentNode.querySelector('.invalid-feedback');
+                        if (feedback) {
+                            feedback.remove();
+                        }
+                    }
+                }
+
+                passwordInput.addEventListener('input', validatePasswords);
+                confirmPasswordInput.addEventListener('input', validatePasswords);
+            }
+
+            // Auto-dismiss des alertes après 5 secondes
+            const alerts = document.querySelectorAll('.alert-dismissible');
+            alerts.forEach(function(alert) {
+                setTimeout(function() {
+                    if (alert && alert.parentNode) {
+                        alert.remove();
+                    }
+                }, 5000);
+            });
+        });
+    </script>
+{% endblock %}
+
+{% block body %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-12">
+            <h1>Gestion des Participants</h1>
+
+            <!-- Affichage des messages flash -->
+            {% for type, messages in app.flashes %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ type == 'error' ? 'danger' : type }} alert-dismissible fade show" role="alert">
+                        <div class="d-flex align-items-center">
+                            {% if type == 'success' %}
+                                <i class="fas fa-check-circle me-2"></i>
+                            {% elseif type == 'error' %}
+                                <i class="fas fa-exclamation-triangle me-2"></i>
+                            {% elseif type == 'warning' %}
+                                <i class="fas fa-exclamation-circle me-2"></i>
+                            {% else %}
+                                <i class="fas fa-info-circle me-2"></i>
+                            {% endif %}
+                            <span>{{ message }}</span>
+                        </div>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endfor %}
+
+            <!-- Formulaire d'ajout d'un nouveau participant -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-user-plus"></i> Ajouter un nouveau participant
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <!-- Affichage des erreurs globales du formulaire -->
+                    {% if form.vars.errors|length > 0 %}
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <h6 class="alert-heading">
+                                <i class="fas fa-exclamation-triangle"></i> Erreurs de validation
+                            </h6>
+                            <ul class="mb-0">
+                                {% for error in form.vars.errors %}
+                                    <li>{{ error.message }}</li>
+                                {% endfor %}
+                            </ul>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endif %}
+
+                    {{ form_start(form, {'attr': {'class': 'row g-3'}}) }}
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                {{ form_label(form.pseudo, null, {'label_attr': {'class': 'form-label'}}) }}
+                                {{ form_widget(form.pseudo, {'attr': {
+                                    'class': 'form-control' ~ (form.pseudo.vars.errors|length > 0 ? ' is-invalid' : ''),
+                                    'placeholder': 'Ex: john_doe',
+                                    'maxlength': 30
+                                }}) }}
+                                {% if form.pseudo.vars.help %}
+                                    <div class="form-text">{{ form.pseudo.vars.help }}</div>
+                                {% endif %}
+                                {% if form.pseudo.vars.errors|length > 0 %}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.pseudo.vars.errors %}
+                                            <div class="d-flex align-items-center">
+                                                <i class="fas fa-exclamation-circle me-2"></i>
+                                                <span>{{ error.message }}</span>
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                {{ form_label(form.mail, null, {'label_attr': {'class': 'form-label'}}) }}
+                                {{ form_widget(form.mail, {'attr': {
+                                    'class': 'form-control' ~ (form.mail.vars.errors|length > 0 ? ' is-invalid' : ''),
+                                    'placeholder': 'Ex: jean.dupont@example.com',
+                                    'maxlength': 180
+                                }}) }}
+                                {% if form.mail.vars.help %}
+                                    <div class="form-text">{{ form.mail.vars.help }}</div>
+                                {% endif %}
+                                {% if form.mail.vars.errors|length > 0 %}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.mail.vars.errors %}
+                                            <div class="d-flex align-items-center">
+                                                <i class="fas fa-exclamation-circle me-2"></i>
+                                                <span>{{ error.message }}</span>
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            {{ form_row(form.nom) }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form_row(form.prenom) }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form_row(form.telephone) }}
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                {{ form_label(form.plainPassword.first, null, {'label_attr': {'class': 'form-label'}}) }}
+                                {{ form_widget(form.plainPassword.first, {'attr': {
+                                    'class': 'form-control' ~ (form.plainPassword.vars.errors|length > 0 ? ' is-invalid' : ''),
+                                    'placeholder': 'Mot de passe'
+                                }}) }}
+                                {% if form.plainPassword.first.vars.help %}
+                                    <div class="form-text">{{ form.plainPassword.first.vars.help }}</div>
+                                {% endif %}
+                                {% if form.plainPassword.vars.errors|length > 0 %}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.plainPassword.vars.errors %}
+                                            <div class="d-flex align-items-center">
+                                                <i class="fas fa-exclamation-circle me-2"></i>
+                                                <span>{{ error.message }}</span>
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                {{ form_label(form.plainPassword.second, null, {'label_attr': {'class': 'form-label'}}) }}
+                                {{ form_widget(form.plainPassword.second, {'attr': {
+                                    'class': 'form-control' ~ (form.plainPassword.vars.errors|length > 0 ? ' is-invalid' : ''),
+                                    'placeholder': 'Confirmer le mot de passe'
+                                }}) }}
+                                {% if form.plainPassword.vars.errors|length > 0 %}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.plainPassword.vars.errors %}
+                                            <div class="d-flex align-items-center">
+                                                <i class="fas fa-exclamation-circle me-2"></i>
+                                                <span>{{ error.message }}</span>
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            {{ form_row(form.site) }}
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-check">
+                                {{ form_widget(form.administrateur) }}
+                                {{ form_label(form.administrateur) }}
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-check">
+                                {{ form_widget(form.actif) }}
+                                {{ form_label(form.actif) }}
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Créer le participant
+                            </button>
+                            <button type="reset" class="btn btn-secondary">
+                                <i class="fas fa-undo"></i> Réinitialiser
+                            </button>
+                        </div>
+                    {{ form_end(form) }}
+                </div>
+            </div>
+
+            <!-- Liste des participants existants -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-users"></i> Liste des participants ({{ participants|length }})
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if participants is empty %}
+                        <p class="text-muted">Aucun participant trouvé.</p>
+                    {% else %}
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Photo</th>
+                                        <th>Pseudo</th>
+                                        <th>Nom</th>
+                                        <th>Prénom</th>
+                                        <th>Email</th>
+                                        <th>Site</th>
+                                        <th>Statut</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for participant in participants %}
+                                        <tr>
+                                            <td>
+                                                {% if participant.photoProfil %}
+                                                    <img src="{{ participant.photoProfil }}" alt="Photo de {{ participant.pseudo }}" class="rounded-circle" style="width: 40px; height: 40px; object-fit: cover;">
+                                                {% else %}
+                                                    <div class="rounded-circle d-flex align-items-center justify-content-center bg-secondary text-white" style="width: 40px; height: 40px; font-size: 16px; font-weight: bold;">
+                                                        {{ participant.prenom|first|upper }}{{ participant.nom|first|upper }}
+                                                    </div>
+                                                {% endif %}
+                                            </td>
+                                            <td>{{ participant.pseudo }}</td>
+                                            <td>{{ participant.nom }}</td>
+                                            <td>{{ participant.prenom }}</td>
+                                            <td>{{ participant.mail }}</td>
+                                            <td>{{ participant.site.nom }}</td>
+                                            <td>
+                                                {% if participant.actif %}
+                                                    <span class="badge bg-success">Actif</span>
+                                                {% else %}
+                                                    <span class="badge bg-danger">Inactif</span>
+                                                {% endif %}
+                                                {% if participant.administrateur %}
+                                                    <span class="badge bg-warning">Admin</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                {% if participant.actif %}
+                                                    <form method="post" action="{{ path('admin_participant_deactivate', {id: participant.id}) }}" class="d-inline">
+                                                        <button type="submit" class="btn btn-sm btn-warning">Désactiver</button>
+                                                    </form>
+                                                {% else %}
+                                                    <form method="post" action="{{ path('admin_participant_activate', {id: participant.id}) }}" class="d-inline">
+                                                        <button type="submit" class="btn btn-sm btn-success">Activer</button>
+                                                    </form>
+                                                {% endif %}
+                                                <form method="post" action="{{ path('admin_participant_reset_password', {id: participant.id}) }}" class="d-inline" onsubmit="return confirm('Êtes-vous sûr de vouloir réinitialiser le mot de passe ?')">
+                                                    <button type="submit" class="btn btn-sm btn-info">Réinitialiser MDP</button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="mt-4">
+                <a href="{{ path('admin_dashboard') }}" class="btn btn-secondary">Retour à l'administration</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

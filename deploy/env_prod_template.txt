@@ -1,0 +1,17 @@
+# Configuration de production
+APP_ENV=prod
+APP_SECRET=your_super_secret_key_here_change_this_in_production
+
+# Base de données de production
+DATABASE_URL="mysql://sortir_user:sortir_secure_password_2024!@127.0.0.1:3306/sortir_prod?serverVersion=8.0&charset=utf8mb4"
+
+# Configuration du serveur
+TRUSTED_PROXIES=127.0.0.1,REMOTE_ADDR
+TRUSTED_HOSTS='^localhost$'
+
+# Configuration des logs
+MAILER_DSN=null://null
+
+# Configuration de sécurité
+CORS_ALLOW_ORIGIN='^https?://(localhost|127\.0\.0\.1)(:[0-9]+)?$'
+

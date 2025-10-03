@@ -1,0 +1,220 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Carte des Événements{% endblock %}
+
+{% block main_class %}py-4{% endblock %}
+
+{% block body %}
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar avec filtres -->
+        <div class="col-lg-3 col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="bi bi-funnel"></i> Filtres</h5>
+                </div>
+                <div class="card-body">
+                    <form id="filters-form" method="GET">
+                        <div class="mb-3">
+                            <label for="etat" class="form-label">État</label>
+                            <select name="etat" id="etat" class="form-select">
+                                <option value="">Tous les états</option>
+                                <option value="Ouverte" {{ filters.etat == 'Ouverte' ? 'selected' : '' }}>Ouverte</option>
+                                <option value="Clôturée" {{ filters.etat == 'Clôturée' ? 'selected' : '' }}>Clôturée</option>
+                                <option value="En cours" {{ filters.etat == 'En cours' ? 'selected' : '' }}>En cours</option>
+                                <option value="Terminée" {{ filters.etat == 'Terminée' ? 'selected' : '' }}>Terminée</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="site" class="form-label">Site</label>
+                            <select name="site" id="site" class="form-select">
+                                <option value="">Tous les sites</option>
+                                {% for site in sites %}
+                                    <option value="{{ site.id }}" {{ filters.site == site.id ? 'selected' : '' }}>
+                                        {{ site.nom }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="date_debut" class="form-label">Date de début</label>
+                            <input type="date" name="date_debut" id="date_debut" class="form-control"
+                                   value="{{ filters.date_debut }}">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="date_fin" class="form-label">Date de fin</label>
+                            <input type="date" name="date_fin" id="date_fin" class="form-control"
+                                   value="{{ filters.date_fin }}">
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-search"></i> Filtrer
+                            </button>
+                            <a href="{{ path('events_map') }}" class="btn btn-outline-secondary">
+                                <i class="bi bi-arrow-clockwise"></i> Réinitialiser
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Statistiques -->
+            <div class="card shadow-sm mt-3">
+                <div class="card-header bg-info text-white">
+                    <h6 class="mb-0"><i class="bi bi-bar-chart"></i> Statistiques</h6>
+                </div>
+                <div class="card-body">
+                    <div id="stats-container">
+                        <div class="text-center">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Chargement...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Carte -->
+        <div class="col-lg-9 col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="bi bi-map"></i> Carte des Événements</h5>
+                    <div>
+                        <button id="fullscreen-btn" class="btn btn-outline-light btn-sm">
+                            <i class="bi bi-fullscreen"></i>
+                        </button>
+                        <button id="refresh-btn" class="btn btn-outline-light btn-sm">
+                            <i class="bi bi-arrow-clockwise"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    <div id="events-map" class="fullscreen"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="{{ asset('assets/js/map.js') }}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialiser la carte
+            const eventsMap = new SortirMap('events-map', {
+                center: [47.2184, -1.5536], // Nantes
+                zoom: 10
+            });
+
+            // Charger les événements
+            loadEvents();
+
+            // Gérer les filtres
+            document.getElementById('filters-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                loadEvents();
+            });
+
+            // Bouton plein écran
+            document.getElementById('fullscreen-btn').addEventListener('click', function() {
+                const mapContainer = document.getElementById('events-map');
+                mapContainer.classList.toggle('fullscreen');
+
+                setTimeout(() => {
+                    eventsMap.map.invalidateSize();
+                }, 100);
+            });
+
+            // Bouton actualiser
+            document.getElementById('refresh-btn').addEventListener('click', function() {
+                loadEvents();
+            });
+
+            function loadEvents() {
+                const formData = new FormData(document.getElementById('filters-form'));
+                const params = new URLSearchParams();
+
+                for (let [key, value] of formData.entries()) {
+                    if (value) params.append(key, value);
+                }
+
+                // Afficher le spinner
+                document.getElementById('stats-container').innerHTML = `
+                    <div class="text-center">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Chargement...</span>
+                        </div>
+                    </div>
+                `;
+
+                fetch(`{{ path('map_sorties') }}?${params.toString()}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        // Effacer les marqueurs existants
+                        eventsMap.clearAllMarkers();
+
+                        // Ajouter les nouveaux marqueurs
+                        data.forEach(event => {
+                            eventsMap.addEventMarker(event);
+                        });
+
+                        // Afficher les statistiques
+                        displayStats(data);
+
+                        // Ajuster la vue si nécessaire
+                        if (data.length > 0) {
+                            const bounds = L.latLngBounds(data.map(e => [e.latitude, e.longitude]));
+                            eventsMap.fitBounds(bounds);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Erreur lors du chargement des événements:', error);
+                        document.getElementById('stats-container').innerHTML = `
+                            <div class="alert alert-danger">
+                                <i class="bi bi-exclamation-triangle"></i>
+                                Erreur lors du chargement des données
+                            </div>
+                        `;
+                    });
+            }
+
+            function displayStats(events) {
+                const stats = {
+                    total: events.length,
+                    ouverte: events.filter(e => e.etat === 'Ouverte').length,
+                    cloturee: events.filter(e => e.etat === 'Clôturée').length,
+                    enCours: events.filter(e => e.etat === 'En cours').length,
+                    terminee: events.filter(e => e.etat === 'Terminée').length
+                };
+
+                document.getElementById('stats-container').innerHTML = `
+                    <div class="row text-center">
+                        <div class="col-6 mb-2">
+                            <div class="badge bg-primary fs-6">${stats.total}</div>
+                            <div class="small">Total</div>
+                        </div>
+                        <div class="col-6 mb-2">
+                            <div class="badge bg-success fs-6">${stats.ouverte}</div>
+                            <div class="small">Ouvertes</div>
+                        </div>
+                        <div class="col-6 mb-2">
+                            <div class="badge bg-warning fs-6">${stats.cloturee}</div>
+                            <div class="small">Clôturées</div>
+                        </div>
+                        <div class="col-6 mb-2">
+                            <div class="badge bg-info fs-6">${stats.enCours}</div>
+                            <div class="small">En cours</div>
+                        </div>
+                    </div>
+                `;
+            }
+        });
+    </script>
+{% endblock %}

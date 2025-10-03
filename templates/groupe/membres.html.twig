@@ -1,0 +1,174 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Membres de {{ groupe.nom }}{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="h3 mb-0">
+                    <i class="fas fa-users me-2"></i>Membres de "{{ groupe.nom }}"
+                </h1>
+                <div>
+                    <a href="{{ path('groupe_show', {'id': groupe.id}) }}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-1"></i>Retour au groupe
+                    </a>
+                </div>
+            </div>
+
+            <!-- Statistiques -->
+            <div class="row mb-4">
+                <div class="col-md-3">
+                    <div class="card text-center">
+                        <div class="card-body">
+                            <h4 class="text-primary">{{ groupe.nbParticipants }}</h4>
+                            <small class="text-muted">Membres total</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-center">
+                        <div class="card-body">
+                            <h4 class="text-success">{{ groupe.participants|filter(p => p.actif)|length }}</h4>
+                            <small class="text-muted">Membres actifs</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-center">
+                        <div class="card-body">
+                            <h4 class="text-info">{{ groupe.participants|filter(p => p.administrateur)|length }}</h4>
+                            <small class="text-muted">Administrateurs</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-center">
+                        <div class="card-body">
+                            <h4 class="text-warning">{{ groupe.nbSorties }}</h4>
+                            <small class="text-muted">Sorties organisées</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Ajouter un membre -->
+            {% if can_manage_members %}
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-user-plus me-2"></i>Ajouter un membre
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <form method="post" action="{{ path('groupe_add_member', {'id': groupe.id}) }}">
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <input type="text" name="pseudo" class="form-control"
+                                           placeholder="Pseudo du participant à ajouter" required>
+                                </div>
+                                <div class="col-md-4">
+                                    <button type="submit" class="btn btn-primary w-100">
+                                        <i class="fas fa-user-plus me-1"></i>Ajouter
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            {% endif %}
+
+            <!-- Liste des membres -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-list me-2"></i>Liste des membres
+                    </h5>
+                </div>
+                <div class="card-body p-0">
+                    {% if groupe.participants is empty %}
+                        <div class="text-center py-5">
+                            <i class="fas fa-users fa-3x text-muted mb-3"></i>
+                            <h4 class="text-muted">Aucun membre</h4>
+                            <p class="text-muted">Ce groupe n'a pas encore de membres.</p>
+                        </div>
+                    {% else %}
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Membre</th>
+                                        <th>Pseudo</th>
+                                        <th>Email</th>
+                                        <th>Site</th>
+                                        <th>Statut</th>
+                                        {% if can_manage_members %}
+                                            <th>Actions</th>
+                                        {% endif %}
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for participant in groupe.participants %}
+                                        <tr>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    {% if participant.photoProfil %}
+                                                        <img src="{{ asset('uploads/profiles/' ~ participant.photoProfil) }}"
+                                                             alt="Photo de {{ participant.pseudo }}"
+                                                             class="rounded-circle me-3"
+                                                             style="width: 40px; height: 40px; object-fit: cover;">
+                                                    {% else %}
+                                                        <div class="bg-secondary rounded-circle me-3 d-flex align-items-center justify-content-center"
+                                                             style="width: 40px; height: 40px;">
+                                                            <i class="fas fa-user text-white"></i>
+                                                        </div>
+                                                    {% endif %}
+                                                    <div>
+                                                        <strong>{{ participant.prenom }} {{ participant.nom }}</strong>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-light text-dark">@{{ participant.pseudo }}</span>
+                                            </td>
+                                            <td>{{ participant.mail }}</td>
+                                            <td>{{ participant.site.nom }}</td>
+                                            <td>
+                                                {% if participant == groupe.createur %}
+                                                    <span class="badge bg-primary">Créateur</span>
+                                                {% elseif participant.administrateur %}
+                                                    <span class="badge bg-danger">Admin</span>
+                                                {% elseif participant.actif %}
+                                                    <span class="badge bg-success">Actif</span>
+                                                {% else %}
+                                                    <span class="badge bg-secondary">Inactif</span>
+                                                {% endif %}
+                                            </td>
+                                            {% if can_manage_members %}
+                                                <td>
+                                                    {% if participant != groupe.createur %}
+                                                        <form method="post" action="{{ path('groupe_remove_member', {'id': groupe.id, 'participantId': participant.id}) }}"
+                                                              class="d-inline">
+                                                            <button type="submit" class="btn btn-outline-danger btn-sm"
+                                                                    onclick="return confirm('Êtes-vous sûr de vouloir retirer {{ participant.prenom }} {{ participant.nom }} du groupe ?')">
+                                                                <i class="fas fa-user-minus"></i>
+                                                            </button>
+                                                        </form>
+                                                    {% else %}
+                                                        <span class="text-muted">Créateur</span>
+                                                    {% endif %}
+                                                </td>
+                                            {% endif %}
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

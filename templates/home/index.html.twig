@@ -1,0 +1,379 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Accueil - Sortir{% endblock %}
+
+{% block main_class %}py-4{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        /* Styles pour les cartes avec photos */
+        .sortie-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            overflow: hidden;
+        }
+
+        .sortie-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15) !important;
+        }
+
+        .card-image-container {
+            border-radius: 0.375rem 0.375rem 0 0;
+            overflow: hidden;
+        }
+
+        .card-image-overlay {
+            transition: opacity 0.3s ease;
+        }
+
+        .sortie-card:hover .card-image-overlay {
+            opacity: 0.8;
+        }
+
+        /* Amélioration de la lisibilité du texte sur les images */
+        .card-title {
+            font-weight: 600;
+            line-height: 1.2;
+        }
+
+        /* Animation pour les cartes sans photo */
+        .sortie-card:not(:has(.card-image-container)) .card-header {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-bottom: 2px solid #dee2e6;
+        }
+
+        /* Responsive design pour les cartes */
+        @media (max-width: 768px) {
+            .card-image-container {
+                height: 150px !important;
+            }
+
+            .card-title {
+                font-size: 1rem;
+            }
+        }
+
+        /* Effet de chargement pour les images */
+        .card-image-container {
+            background-color: #f8f9fa;
+            background-image:
+                linear-gradient(45deg, transparent 25%, rgba(255,255,255,.2) 25%, rgba(255,255,255,.2) 50%, transparent 50%, transparent 75%, rgba(255,255,255,.2) 75%, rgba(255,255,255,.2)),
+                linear-gradient(-45deg, transparent 25%, rgba(255,255,255,.2) 25%, rgba(255,255,255,.2) 50%, transparent 50%, transparent 75%, rgba(255,255,255,.2) 75%, rgba(255,255,255,.2));
+            background-size: 20px 20px;
+            background-position: 0 0, 0 10px;
+        }
+
+        /* Quand une image est chargée, supprimer seulement le pattern de chargement */
+        .card-image-container.image-loaded {
+            background-color: transparent !important;
+            /* Ne pas supprimer l'image de fond, seulement le pattern de chargement */
+        }
+
+        /* Forcer l'affichage des images de fond */
+        .card-image-container[data-bg-image] {
+            background-attachment: scroll !important;
+            background-clip: border-box !important;
+            background-origin: padding-box !important;
+            background-repeat: no-repeat !important;
+            background-size: cover !important;
+            background-position: center !important;
+        }
+
+        /* États de chargement des images */
+        .image-loading {
+            background-color: #f8f9fa !important;
+            background-image:
+                linear-gradient(45deg, transparent 25%, rgba(255,255,255,.2) 25%, rgba(255,255,255,.2) 50%, transparent 50%, transparent 75%, rgba(255,255,255,.2) 75%, rgba(255,255,255,.2)),
+                linear-gradient(-45deg, transparent 25%, rgba(255,255,255,.2) 25%, rgba(255,255,255,.2) 50%, transparent 50%, transparent 75%, rgba(255,255,255,.2) 75%, rgba(255,255,255,.2)) !important;
+            background-size: 20px 20px;
+            background-position: 0 0, 0 10px;
+            animation: loading-shimmer 1.5s infinite;
+        }
+
+        .image-error {
+            background-color: #f8f9fa !important;
+            background-image:
+                linear-gradient(45deg, transparent 25%, rgba(255,255,255,.2) 25%, rgba(255,255,255,.2) 50%, transparent 50%, transparent 75%, rgba(255,255,255,.2) 75%, rgba(255,255,255,.2)),
+                linear-gradient(-45deg, transparent 25%, rgba(255,255,255,.2) 25%, rgba(255,255,255,.2) 50%, transparent 50%, transparent 75%, rgba(255,255,255,.2) 75%, rgba(255,255,255,.2)) !important;
+            background-size: 20px 20px;
+            background-position: 0 0, 0 10px;
+        }
+
+        @keyframes loading-shimmer {
+            0% { background-position: 0 0, 0 10px; }
+            100% { background-position: 20px 20px, 20px 30px; }
+        }
+    </style>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Gestion du chargement des images de fond
+            const imageContainers = document.querySelectorAll('.card-image-container[data-bg-image]');
+
+            imageContainers.forEach(function(container) {
+                const imageUrl = container.getAttribute('data-bg-image');
+
+                // Marquer comme en cours de chargement
+                container.classList.add('image-loading');
+
+                // Créer une image pour tester le chargement
+                const testImage = new Image();
+
+                testImage.onload = function() {
+                    // Image chargée avec succès - confirmer l'affichage
+                    container.classList.remove('image-loading');
+                    container.classList.add('image-loaded');
+                    // S'assurer que l'image de fond est bien appliquée
+                    container.style.backgroundImage = `url('${imageUrl}')`;
+                };
+
+                testImage.onerror = function() {
+                    // Erreur de chargement - utiliser l'image de fallback
+                    container.style.backgroundImage = `url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZGVmcz48bGluZWFyR3JhZGllbnQgaWQ9ImciIHgxPSIwJSIgeTE9IjAlIiB4Mj0iMTAwJSIgeTI9IjEwMCUiPjxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiNmOGY5ZmEiLz48c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiNlOWVjZWYiLz48L2xpbmVhckdyYWRpZW50PjwvZGVmcz48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSJ1cmwoI2cpIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzZjNzU3ZCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkltYWdlIG5vbiBkaXNwb25pYmxlPC90ZXh0Pjwvc3ZnPg==')`;
+                    container.classList.remove('image-loading');
+                    container.classList.add('image-error');
+                };
+
+                // Démarrer le test de chargement
+                testImage.src = imageUrl;
+            });
+
+            // Animation d'apparition des cartes
+            const cards = document.querySelectorAll('.sortie-card');
+            cards.forEach(function(card, index) {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+
+                setTimeout(function() {
+                    card.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, index * 100);
+            });
+        });
+    </script>
+{% endblock %}
+
+{% block body %}
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1><i class="bi bi-calendar-event"></i> Sorties</h1>
+                {% if app.user %}
+                    <a href="{{ path('sortie_new') }}" class="btn btn-primary">
+                        <i class="bi bi-plus-circle"></i> Créer une sortie
+                    </a>
+                {% endif %}
+            </div>
+
+            <!-- Filtres -->
+            <div class="card mb-4 filters-mobile">
+                <div class="card-header">
+                    <h5><i class="bi bi-funnel"></i> Filtres</h5>
+                </div>
+                <div class="card-body">
+                    <form method="get" class="row g-3">
+                        <div class="col-md-3">
+                            <label for="site" class="form-label">Site</label>
+                            <select name="site" id="site" class="form-select">
+                                <option value="">Tous les sites</option>
+                                {% for site in sites %}
+                                    <option value="{{ site.id }}" {{ filters.site == site.id ? 'selected' : '' }}>
+                                        {{ site.nom }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="col-md-3">
+                            <label for="etat" class="form-label">État</label>
+                            <select name="etat" id="etat" class="form-select">
+                                <option value="">Tous les états</option>
+                                {% for etat in etats %}
+                                    <option value="{{ etat.libelle }}" {{ filters.etat == etat.libelle ? 'selected' : '' }}>
+                                        {{ etat.libelle }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="col-md-3">
+                            <label for="periode" class="form-label">Période</label>
+                            <select name="periode" id="periode" class="form-select">
+                                <option value="">Toutes les périodes</option>
+                                <option value="today" {{ filters.periode == 'today' ? 'selected' : '' }}>Aujourd'hui</option>
+                                <option value="week" {{ filters.periode == 'week' ? 'selected' : '' }}>Cette semaine</option>
+                                <option value="month" {{ filters.periode == 'month' ? 'selected' : '' }}>Ce mois</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-3">
+                            <label for="recherche" class="form-label">Recherche</label>
+                            <input type="text" name="recherche" id="recherche" class="form-control"
+                                   value="{{ filters.recherche }}" placeholder="Nom de la sortie...">
+                        </div>
+
+                        {% if app.user %}
+                            <div class="col-md-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="organisateur" id="organisateur"
+                                           {{ filters.organisateur ? 'checked' : '' }}>
+                                    <label class="form-check-label" for="organisateur">
+                                        Sorties dont je suis l'organisateur
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="col-md-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="inscrit" id="inscrit"
+                                           {{ filters.inscrit ? 'checked' : '' }}>
+                                    <label class="form-check-label" for="inscrit">
+                                        Sorties auxquelles je suis inscrit(e)
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="col-md-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="non_inscrit" id="non_inscrit"
+                                           {{ filters.non_inscrit ? 'checked' : '' }}>
+                                    <label class="form-check-label" for="non_inscrit">
+                                        Sorties auxquelles je ne suis pas inscrit(e)
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="col-md-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="passees" id="passees"
+                                           {{ filters.passees ? 'checked' : '' }}>
+                                    <label class="form-check-label" for="passees">
+                                        Sorties passées
+                                    </label>
+                                </div>
+                            </div>
+                        {% endif %}
+
+                        <div class="col-12">
+                            <button type="submit" class="btn btn-primary">Filtrer</button>
+                            <a href="{{ path('home') }}" class="btn btn-secondary">Réinitialiser</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Liste des sorties -->
+            {% if sorties is empty %}
+                <div class="alert alert-info text-center">
+                    <i class="bi bi-info-circle"></i>
+                    <p class="mb-0">Aucune sortie trouvée avec ces critères.</p>
+                </div>
+            {% else %}
+                <div class="row">
+                    {% for sortieData in sorties %}
+                        {% set sortie = sortieData.sortie %}
+                        {% set is_inscrit = sortieData.is_inscrit %}
+                        <div class="col-md-6 col-lg-4 mb-4">
+                            <div class="card h-100 shadow-sm sortie-card">
+                                {% if sortie.urlPhoto %}
+                                    <div class="card-image-container"
+                                         style="height: 200px; background-image: url('{{ sortie.urlPhoto }}'); background-size: cover; background-position: center; background-repeat: no-repeat; position: relative;"
+                                         data-bg-image="{{ sortie.urlPhoto }}">
+                                        <div class="card-image-overlay" style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(to bottom, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.7) 100%);"></div>
+                                        <div class="card-header d-flex justify-content-between align-items-center" style="position: relative; z-index: 2; background: transparent; border: none;">
+                                            <h5 class="card-title mb-0 text-white" style="text-shadow: 2px 2px 4px rgba(0,0,0,0.8);">{{ sortie.nom }}</h5>
+                                            <span class="badge bg-{{
+                                                sortie.etat.libelle == 'Créée' ? 'secondary' :
+                                                sortie.etat.libelle == 'Ouverte' ? 'success' :
+                                                sortie.etat.libelle == 'Clôturée' ? 'warning' :
+                                                sortie.etat.libelle == 'En cours' ? 'primary' :
+                                                sortie.etat.libelle == 'Terminée' ? 'info' :
+                                                sortie.etat.libelle == 'Annulée' ? 'danger' :
+                                                'dark'
+                                            }}" style="text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">
+                                                {{ sortie.etat.libelle }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                {% else %}
+                                    <div class="card-header d-flex justify-content-between align-items-center">
+                                        <h5 class="card-title mb-0">{{ sortie.nom }}</h5>
+                                        <span class="badge bg-{{
+                                            sortie.etat.libelle == 'Créée' ? 'secondary' :
+                                            sortie.etat.libelle == 'Ouverte' ? 'success' :
+                                            sortie.etat.libelle == 'Clôturée' ? 'warning' :
+                                            sortie.etat.libelle == 'En cours' ? 'primary' :
+                                            sortie.etat.libelle == 'Terminée' ? 'info' :
+                                            sortie.etat.libelle == 'Annulée' ? 'danger' :
+                                            'dark'
+                                        }}">
+                                            {{ sortie.etat.libelle }}
+                                        </span>
+                                    </div>
+                                {% endif %}
+                                <div class="card-body">
+                                    <div class="mb-2">
+                                        <i class="bi bi-calendar-date text-primary"></i>
+                                        <strong>{{ sortie.dateHeureDebut|date('d/m/Y H:i') }}</strong>
+                                    </div>
+                                    <div class="mb-2">
+                                        <i class="bi bi-geo-alt text-primary"></i>
+                                        {{ sortie.lieu.nom }}
+                                    </div>
+                                    <div class="mb-2 d-flex align-items-center">
+                                        <i class="bi bi-person text-primary me-2"></i>
+                                        {% if sortie.organisateur.photoProfil %}
+                                            <img src="{{ sortie.organisateur.photoProfil }}" alt="Photo de {{ sortie.organisateur.pseudo }}" class="rounded-circle me-2" style="width: 20px; height: 20px; object-fit: cover;">
+                                        {% else %}
+                                            <div class="rounded-circle me-2 d-flex align-items-center justify-content-center bg-primary text-white" style="width: 20px; height: 20px; font-size: 10px; font-weight: bold;">
+                                                {{ sortie.organisateur.prenom|first|upper }}{{ sortie.organisateur.nom|first|upper }}
+                                            </div>
+                                        {% endif %}
+                                        <span>{{ sortie.organisateur.pseudo }}</span>
+                                    </div>
+                                    <div class="mb-2">
+                                        <i class="bi bi-people text-primary"></i>
+                                        {{ sortie.inscriptions|length }}/{{ sortie.nbInscriptionsMax }} participants
+                                    </div>
+
+                                    {% if sortie.infosSortie %}
+                                        <p class="text-muted small">{{ sortie.infosSortie|length > 100 ? sortie.infosSortie|slice(0, 100) ~ '...' : sortie.infosSortie }}</p>
+                                    {% endif %}
+                                </div>
+                                <div class="card-footer bg-transparent">
+                                    <div class="d-grid gap-2">
+                                        <a href="{{ path('sortie_show', {id: sortie.id}) }}" class="btn btn-primary">
+                                            <i class="bi bi-eye"></i> Voir détails
+                                        </a>
+                                        {% if app.user and sortie.etat.libelle == 'Ouverte' %}
+                                            {% if is_inscrit %}
+                                                <form method="post" action="{{ path('sortie_desistement', {id: sortie.id}) }}" class="d-inline">
+                                                    <button type="submit" class="btn btn-outline-warning w-100">
+                                                        <i class="bi bi-x-circle"></i> Se désinscrire
+                                                    </button>
+                                                </form>
+                                            {% else %}
+                                                <form method="post" action="{{ path('sortie_inscription', {id: sortie.id}) }}" class="d-inline">
+                                                    <button type="submit" class="btn btn-success w-100">
+                                                        <i class="bi bi-check-circle"></i> S'inscrire
+                                                    </button>
+                                                </form>
+                                            {% endif %}
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

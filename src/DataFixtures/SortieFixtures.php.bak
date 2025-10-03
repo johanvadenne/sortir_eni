@@ -1,0 +1,232 @@
+<?php
+
+namespace App\DataFixtures;
+
+use App\Entity\Sortie;
+use Doctrine\Bundle\FixturesBundle\Fixture;
+use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
+use Doctrine\Persistence\ObjectManager;
+
+class SortieFixtures extends Fixture implements FixtureGroupInterface
+{
+    public function load(ObjectManager $manager): void
+    {
+        $now = new \DateTime();
+
+        $sorties = [
+            // Sorties créées (non publiées)
+            [
+                'nom' => 'Visite du Château de Nantes',
+                'dateHeureDebut' => (clone $now)->modify('+1 week'),
+                'duree' => 120,
+                'dateLimiteInscription' => (clone $now)->modify('+5 days'),
+                'nbInscriptionsMax' => 15,
+                'infosSortie' => 'Visite guidée du château des Ducs de Bretagne avec un guide professionnel.',
+                'urlPhoto' => 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=800&h=400&fit=crop',
+                'lieu' => 'chateau_des_ducs_de_bretagne',
+                'organisateur' => 'jean.dupont',
+                'etat' => 'creee'
+            ],
+            [
+                'nom' => 'Randonnée en forêt de Rennes',
+                'dateHeureDebut' => (clone $now)->modify('+2 weeks'),
+                'duree' => 180,
+                'dateLimiteInscription' => (clone $now)->modify('+12 days'),
+                'nbInscriptionsMax' => 20,
+                'infosSortie' => 'Randonnée de 8km dans la forêt de Rennes. Prévoir de bonnes chaussures.',
+                'urlPhoto' => 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=800&h=400&fit=crop',
+                'lieu' => 'parc_du_thabor',
+                'organisateur' => 'marie.martin',
+                'etat' => 'creee'
+            ],
+
+            // Sorties ouvertes (inscriptions ouvertes)
+            [
+                'nom' => 'Découverte du Vieux Angers',
+                'dateHeureDebut' => (clone $now)->modify('+3 days'),
+                'duree' => 90,
+                'dateLimiteInscription' => (clone $now)->modify('+1 day'),
+                'nbInscriptionsMax' => 12,
+                'infosSortie' => 'Visite du centre historique d\'Angers avec ses maisons à colombages.',
+                'urlPhoto' => 'https://images.unsplash.com/photo-1502602898536-47ad22581b52?w=800&h=400&fit=crop',
+                'lieu' => 'chateau_dangers',
+                'organisateur' => 'pierre.bernard',
+                'etat' => 'ouverte'
+            ],
+            [
+                'nom' => 'Circuit automobile au Mans',
+                'dateHeureDebut' => (clone $now)->modify('+1 week'),
+                'duree' => 240,
+                'dateLimiteInscription' => (clone $now)->modify('+5 days'),
+                'nbInscriptionsMax' => 25,
+                'infosSortie' => 'Visite du circuit de la Sarthe et du musée des 24h du Mans.',
+                'urlPhoto' => 'https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?w=800&h=400&fit=crop',
+                'lieu' => 'circuit_de_la_sarthe',
+                'organisateur' => 'sophie.leroy',
+                'etat' => 'ouverte'
+            ],
+            [
+                'nom' => 'Dégustation de vins à Tours',
+                'dateHeureDebut' => (clone $now)->modify('+10 days'),
+                'duree' => 150,
+                'dateLimiteInscription' => (clone $now)->modify('+8 days'),
+                'nbInscriptionsMax' => 18,
+                'infosSortie' => 'Dégustation de vins de la région de Tours dans une cave traditionnelle.',
+                'urlPhoto' => 'https://images.unsplash.com/photo-1513475382585-d06e58bcb0e0?w=800&h=400&fit=crop',
+                'lieu' => 'place_plumereau',
+                'organisateur' => 'thomas.petit',
+                'etat' => 'ouverte'
+            ],
+
+            // Sorties clôturées (inscriptions fermées)
+            [
+                'nom' => 'Visite d\'Orléans historique',
+                'dateHeureDebut' => (clone $now)->modify('+2 days'),
+                'duree' => 120,
+                'dateLimiteInscription' => (clone $now)->modify('-1 day'),
+                'nbInscriptionsMax' => 15,
+                'infosSortie' => 'Découverte de l\'histoire d\'Orléans et de Jeanne d\'Arc.',
+                'urlPhoto' => 'https://images.unsplash.com/photo-1520637836862-4d197d17c93a?w=800&h=400&fit=crop',
+                'lieu' => 'place_du_martroi',
+                'organisateur' => 'laura.durand',
+                'etat' => 'cloturee'
+            ],
+            [
+                'nom' => 'Escalade en salle',
+                'dateHeureDebut' => (clone $now)->modify('+4 days'),
+                'duree' => 180,
+                'dateLimiteInscription' => (clone $now)->modify('+1 day'),
+                'nbInscriptionsMax' => 10,
+                'infosSortie' => 'Session d\'escalade en salle pour tous niveaux. Matériel fourni.',
+                'urlPhoto' => 'https://images.unsplash.com/photo-1551632811-561732d1e306?w=800&h=400&fit=crop',
+                'lieu' => 'chateau_des_ducs_de_bretagne',
+                'organisateur' => 'alexandre.moreau',
+                'etat' => 'cloturee'
+            ],
+
+            // Sorties en cours
+            [
+                'nom' => 'Concert de musique classique',
+                'dateHeureDebut' => (clone $now)->modify('-1 hour'),
+                'duree' => 120,
+                'dateLimiteInscription' => (clone $now)->modify('-2 days'),
+                'nbInscriptionsMax' => 50,
+                'infosSortie' => 'Concert de musique classique dans la cathédrale de Nantes.',
+                'urlPhoto' => 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=800&h=400&fit=crop',
+                'lieu' => 'jardin_des_plantes',
+                'organisateur' => 'camille.simon',
+                'etat' => 'en_cours'
+            ],
+
+            // Sorties terminées
+            [
+                'nom' => 'Exposition d\'art moderne',
+                'dateHeureDebut' => (clone $now)->modify('-1 week'),
+                'duree' => 90,
+                'dateLimiteInscription' => (clone $now)->modify('-10 days'),
+                'nbInscriptionsMax' => 20,
+                'infosSortie' => 'Visite de l\'exposition d\'art moderne au musée de Rennes.',
+                'urlPhoto' => 'https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=800&h=400&fit=crop',
+                'lieu' => 'place_de_la_mairie',
+                'organisateur' => 'nicolas.laurent',
+                'etat' => 'terminee'
+            ],
+            [
+                'nom' => 'Randonnée en montagne',
+                'dateHeureDebut' => (clone $now)->modify('-2 weeks'),
+                'duree' => 300,
+                'dateLimiteInscription' => (clone $now)->modify('-17 days'),
+                'nbInscriptionsMax' => 12,
+                'infosSortie' => 'Randonnée de 15km en montagne avec pique-nique au sommet.',
+                'urlPhoto' => 'https://images.unsplash.com/photo-1551632811-561732d1e306?w=800&h=400&fit=crop',
+                'lieu' => 'cathédrale_saint_pierre',
+                'organisateur' => 'julie.lefebvre',
+                'etat' => 'terminee'
+            ],
+
+            // Sorties annulées
+            [
+                'nom' => 'Festival de musique annulé',
+                'dateHeureDebut' => (clone $now)->modify('+1 week'),
+                'duree' => 480,
+                'dateLimiteInscription' => (clone $now)->modify('+5 days'),
+                'nbInscriptionsMax' => 100,
+                'infosSortie' => 'Festival de musique annulé pour cause de mauvais temps.',
+                'urlPhoto' => 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=800&h=400&fit=crop',
+                'lieu' => 'ile_de_nantes',
+                'organisateur' => 'antoine.michel',
+                'etat' => 'annulee'
+            ],
+
+            // Sorties historisées
+            [
+                'nom' => 'Visite de Paris historique',
+                'dateHeureDebut' => (clone $now)->modify('-2 months'),
+                'duree' => 240,
+                'dateLimiteInscription' => (clone $now)->modify('-2 months')->modify('-3 days'),
+                'nbInscriptionsMax' => 30,
+                'infosSortie' => 'Visite des monuments historiques de Paris : Tour Eiffel, Louvre, Notre-Dame.',
+                'urlPhoto' => 'https://images.unsplash.com/photo-1502602898536-47ad22581b52?w=800&h=400&fit=crop',
+                'lieu' => 'tour_eiffel',
+                'organisateur' => 'emma.garcia',
+                'etat' => 'historisee'
+            ],
+            [
+                'nom' => 'Croisière sur la Seine',
+                'dateHeureDebut' => (clone $now)->modify('-3 months'),
+                'duree' => 180,
+                'dateLimiteInscription' => (clone $now)->modify('-3 months')->modify('-5 days'),
+                'nbInscriptionsMax' => 40,
+                'infosSortie' => 'Croisière commentée sur la Seine avec déjeuner à bord.',
+                'urlPhoto' => 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=800&h=400&fit=crop',
+                'lieu' => 'louvre',
+                'organisateur' => 'quentin.david',
+                'etat' => 'historisee'
+            ]
+        ];
+
+        foreach ($sorties as $sortieData) {
+            $sortie = new Sortie();
+            $sortie->setNom($sortieData['nom']);
+            $sortie->setDateHeureDebut($sortieData['dateHeureDebut']);
+            $sortie->setDuree($sortieData['duree']);
+            $sortie->setDateLimiteInscription($sortieData['dateLimiteInscription']);
+            $sortie->setNbInscriptionsMax($sortieData['nbInscriptionsMax']);
+            $sortie->setInfosSortie($sortieData['infosSortie']);
+            $sortie->setUrlPhoto($sortieData['urlPhoto']);
+
+            // Récupérer le lieu par référence
+            $lieu = $this->getReference('lieu_' . $sortieData['lieu'], \App\Entity\Lieu::class);
+            $sortie->setLieu($lieu);
+
+            // Récupérer l'organisateur par référence
+            $organisateur = $this->getReference('participant_' . $sortieData['organisateur'], \App\Entity\Participant::class);
+            $sortie->setOrganisateur($organisateur);
+
+            // Récupérer l'état par référence
+            $etat = $this->getReference('etat_' . $sortieData['etat'], \App\Entity\Etat::class);
+            $sortie->setEtat($etat);
+
+            $manager->persist($sortie);
+
+            // Créer des références pour les autres fixtures
+            $this->addReference('sortie_' . strtolower(str_replace([' ', '\'', '-', 'é', 'è', 'ç'], ['_', '', '_', 'e', 'e', 'c'], $sortieData['nom'])), $sortie);
+        }
+
+        $manager->flush();
+    }
+
+    public function getDependencies(): array
+    {
+        return [
+            EtatFixtures::class,
+            LieuFixtures::class,
+            ParticipantFixtures::class,
+        ];
+    }
+
+    public static function getGroups(): array
+    {
+        return ['sortie'];
+    }
+}

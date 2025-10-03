@@ -1,0 +1,59 @@
+# Dockerfile pour l'application Symfony Sortir
+FROM php:8.3-fpm
+
+# Installer les dépendances système
+RUN apt-get update && apt-get install -y \
+    git \
+    curl \
+    libpng-dev \
+    libonig-dev \
+    libxml2-dev \
+    libzip-dev \
+    zip \
+    unzip \
+    nodejs \
+    npm \
+    && docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip intl
+
+# Installer Composer
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+
+# Créer le répertoire de travail
+WORKDIR /var/www/html
+
+# Copier les fichiers de configuration
+COPY composer.json composer.lock ./
+
+# Installer les dépendances PHP (avec dev pour le build)
+RUN composer install --optimize-autoloader --no-scripts --no-interaction
+
+# Copier le code source
+COPY . .
+
+# Configurer Git pour éviter les erreurs de permissions
+RUN git config --global --add safe.directory /var/www/html
+
+# Supprimer la configuration fixtures pour éviter les erreurs
+RUN rm -f config/packages/doctrine_fixtures.yaml
+
+# Installer les dépendances et optimiser (sans scripts pour éviter les erreurs)
+RUN composer install --optimize-autoloader --no-scripts --no-interaction \
+    && composer dump-autoload --optimize --classmap-authoritative
+
+# Installer les dépendances Node.js (si nécessaire)
+RUN if [ -f package.json ]; then npm install && npm run build; fi
+
+# Configurer les permissions
+RUN chown -R www-data:www-data /var/www/html \
+    && chmod -R 755 /var/www/html \
+    && chmod -R 777 /var/www/html/var
+
+# Créer le répertoire var s'il n'existe pas
+RUN mkdir -p var/cache var/log var/sessions
+
+# Exposer le port
+EXPOSE 8000
+
+# Commande par défaut
+CMD ["php", "-S", "0.0.0.0:8000", "-t", "public"]
+

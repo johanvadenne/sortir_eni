@@ -1,0 +1,545 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Créer une Sortie{% endblock %}
+
+{% block main_class %}py-4{% endblock %}
+
+{% block body %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-10 col-lg-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">
+                        <i class="bi bi-calendar-plus"></i> Créer une Sortie
+                    </h3>
+                </div>
+                <div class="card-body">
+                    {{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
+                        <div class="row">
+                            <div class="col-12">
+                                {{ form_row(form.nom, {'attr': {'class': 'form-control'}}) }}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                {{ form_row(form.dateHeureDebut, {'attr': {'class': 'form-control'}}) }}
+                            </div>
+                            <div class="col-md-6">
+                                {{ form_row(form.dateLimiteInscription, {'attr': {'class': 'form-control'}}) }}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                {{ form_row(form.nbInscriptionsMax, {'attr': {'class': 'form-control'}}) }}
+                            </div>
+                            <div class="col-md-6">
+                                {{ form_row(form.duree, {'attr': {'class': 'form-control'}}) }}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-12">
+                                {{ form_row(form.groupe, {'attr': {'class': 'form-select'}}) }}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="mb-3">
+                                    <label class="form-label">Lieu de la sortie</label>
+                                    <div class="btn-group w-100 mb-3" role="group">
+                                        <input type="radio" class="btn-check" name="lieu-selection" id="lieu-liste" value="liste" checked>
+                                        <label class="btn btn-outline-primary" for="lieu-liste">
+                                            <i class="bi bi-list"></i> Choisir dans la liste
+                                        </label>
+
+                                        <input type="radio" class="btn-check" name="lieu-selection" id="lieu-carte" value="carte">
+                                        <label class="btn btn-outline-primary" for="lieu-carte">
+                                            <i class="bi bi-geo-alt"></i> Sélectionner sur la carte
+                                        </label>
+
+                                        <input type="radio" class="btn-check" name="lieu-selection" id="lieu-nouveau" value="nouveau">
+                                        <label class="btn btn-outline-success" for="lieu-nouveau">
+                                            <i class="bi bi-plus-circle"></i> Créer un nouveau lieu
+                                        </label>
+                                    </div>
+
+                                    <!-- Sélection par liste -->
+                                    <div id="lieu-liste-container">
+                                        {{ form_row(form.lieu, {'attr': {'class': 'form-select'}}) }}
+                                    </div>
+
+                                    <!-- Sélection par carte -->
+                                    <div id="lieu-carte-container" style="display: none;">
+                                        <div class="card">
+                                            <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
+                                                <h6 class="mb-0"><i class="bi bi-map"></i> Sélection du lieu sur la carte</h6>
+                                                <button type="button" class="btn btn-outline-light btn-sm" id="geolocation-btn">
+                                                    <i class="bi bi-geo-alt"></i> Ma position
+                                                </button>
+                                            </div>
+                                            <div class="card-body p-0">
+                                                <div id="lieu-map" style="height: 400px;"></div>
+                                            </div>
+                                            <div class="card-footer">
+                                                <div class="alert alert-info">
+                                                    <i class="bi bi-info-circle"></i>
+                                                    Cliquez sur la carte pour sélectionner un lieu existant ou créer un nouveau lieu.
+                                                </div>
+                                                <div id="selected-lieu-info" style="display: none;">
+                                                    <div class="row">
+                                                        <div class="col-12">
+                                                            <h6>Lieu sélectionné :</h6>
+                                                            <p id="selected-lieu-details" class="text-muted"></p>
+                                                            <button type="button" id="use-selected-lieu" class="btn btn-success btn-sm">
+                                                                <i class="bi bi-check"></i> Utiliser ce lieu
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Création d'un nouveau lieu -->
+                                    <div id="lieu-nouveau-container" style="display: none;">
+                                        <div class="card">
+                                            <div class="card-header bg-success text-white">
+                                                <h6 class="mb-0"><i class="bi bi-plus-circle"></i> Créer un nouveau lieu</h6>
+                                            </div>
+                                            <div class="card-body">
+                                                <div class="row">
+                                                    <div class="col-md-6">
+                                                        <label class="form-label">Nom du lieu *</label>
+                                                        <input type="text" id="nouveau-lieu-nom" class="form-control" placeholder="Nom du lieu" required>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <label class="form-label">Adresse</label>
+                                                        <input type="text" id="nouveau-lieu-adresse" class="form-control" placeholder="Adresse (optionnel)">
+                                                    </div>
+                                                </div>
+                                                <div class="row mt-3">
+                                                    <div class="col-md-6">
+                                                        <label class="form-label">Ville *</label>
+                                                        <select id="nouveau-lieu-ville" class="form-select" required>
+                                                            <option value="">Choisir une ville...</option>
+                                                            {% for ville in villes %}
+                                                                <option value="{{ ville.id }}">{{ ville.nom }} ({{ ville.codePostal }})</option>
+                                                            {% endfor %}
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <label class="form-label">Position</label>
+                                                        <div class="input-group">
+                                                            <input type="number" id="nouveau-lieu-latitude" class="form-control" step="0.000001" placeholder="Latitude" readonly>
+                                                            <input type="number" id="nouveau-lieu-longitude" class="form-control" step="0.000001" placeholder="Longitude" readonly>
+                                                        </div>
+                                                        <small class="form-text text-muted">Cliquez sur la carte pour définir la position</small>
+                                                    </div>
+                                                </div>
+                                                <div class="mt-3">
+                                                    <button type="button" id="geocode-nouveau-btn" class="btn btn-outline-primary btn-sm">
+                                                        <i class="bi bi-search"></i> Rechercher l'adresse
+                                                    </button>
+                                                    <button type="button" id="create-lieu-btn" class="btn btn-success btn-sm">
+                                                        <i class="bi bi-plus"></i> Créer le lieu
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <div class="card-footer">
+                                                <div id="nouveau-lieu-map" style="height: 300px;"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-12">
+                                {{ form_row(form.infosSortie, {'attr': {'class': 'form-control', 'rows': 4}}) }}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-12">
+                                {{ form_row(form.urlPhoto, {'attr': {'class': 'form-control'}}) }}
+                            </div>
+                        </div>
+
+                        <div class="mt-4">
+                            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                <button type="submit" class="btn btn-primary btn-lg">
+                                    <i class="bi bi-check-circle"></i> Créer la sortie
+                                </button>
+                                <a href="{{ path('home') }}" class="btn btn-secondary btn-lg">
+                                    <i class="bi bi-x-circle"></i> Annuler
+                                </a>
+                            </div>
+                        </div>
+                    {{ form_end(form) }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="{{ asset('assets/js/map.js') }}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('JavaScript chargé pour la création de sortie');
+            let lieuMap = null;
+            let nouveauLieuMap = null;
+            let selectedLieu = null;
+            let selectedLocation = null;
+
+            // Gérer le changement de mode de sélection
+            document.querySelectorAll('input[name="lieu-selection"]').forEach(radio => {
+                radio.addEventListener('change', function() {
+                    const listeContainer = document.getElementById('lieu-liste-container');
+                    const carteContainer = document.getElementById('lieu-carte-container');
+                    const nouveauContainer = document.getElementById('lieu-nouveau-container');
+
+                    // Masquer tous les conteneurs
+                    listeContainer.style.display = 'none';
+                    carteContainer.style.display = 'none';
+                    nouveauContainer.style.display = 'none';
+
+                    // Afficher le conteneur sélectionné
+                    if (this.value === 'liste') {
+                        listeContainer.style.display = 'block';
+                    } else if (this.value === 'carte') {
+                        carteContainer.style.display = 'block';
+                        if (!lieuMap) {
+                            initLieuMap();
+                        }
+                    } else if (this.value === 'nouveau') {
+                        nouveauContainer.style.display = 'block';
+                        if (!nouveauLieuMap) {
+                            initNouveauLieuMap();
+                        }
+                    }
+                });
+            });
+
+            function initLieuMap() {
+                try {
+                    lieuMap = new SortirMap('lieu-map', {
+                        center: [47.2184, -1.5536], // Nantes
+                        zoom: 13
+                    });
+
+                    // Charger les lieux existants
+                    loadExistingLieux();
+
+                    // Gérer le clic sur la carte pour sélectionner un lieu
+                    lieuMap.map.on('click', function(e) {
+                        const lat = e.latlng.lat;
+                        const lng = e.latlng.lng;
+
+                        // Vérifier si on clique sur un lieu existant
+                        checkLieuAtPosition(lat, lng);
+                    });
+
+                } catch (error) {
+                    console.error('Erreur lors de la création de la carte:', error);
+                }
+            }
+
+            function initNouveauLieuMap() {
+                try {
+                    nouveauLieuMap = new SortirMap('nouveau-lieu-map', {
+                        center: [47.2184, -1.5536], // Nantes
+                        zoom: 13
+                    });
+
+                    // Surcharger la méthode onLocationSelected
+                    nouveauLieuMap.onLocationSelected = function(lat, lng) {
+                        selectedLocation = { lat, lng };
+                        document.getElementById('nouveau-lieu-latitude').value = lat.toFixed(6);
+                        document.getElementById('nouveau-lieu-longitude').value = lng.toFixed(6);
+
+                        // Géocodage inverse pour obtenir l'adresse
+                        reverseGeocodeNouveau(lat, lng);
+                    };
+
+                } catch (error) {
+                    console.error('Erreur lors de la création de la carte nouveau lieu:', error);
+                }
+            }
+
+            function loadExistingLieux() {
+                fetch('{{ path('sortie_map_api_lieux') }}')
+                    .then(response => response.json())
+                    .then(lieux => {
+                        lieux.forEach(lieu => {
+                            lieuMap.addMarker(lieu.latitude, lieu.longitude, {
+                                popup: `
+                                    <div>
+                                        <h6>${lieu.nom}</h6>
+                                        <p class="mb-1">${lieu.rue || 'Adresse non renseignée'}</p>
+                                        <p class="mb-0">${lieu.ville} (${lieu.codePostal})</p>
+                                    </div>
+                                `,
+                                tooltip: lieu.nom
+                            });
+                        });
+                    })
+                    .catch(error => console.error('Erreur lors du chargement des lieux:', error));
+            }
+
+            function checkLieuAtPosition(lat, lng) {
+                // Vérifier si il y a un lieu à cette position (dans un rayon de ~50m)
+                fetch('{{ path('sortie_map_api_lieux') }}')
+                    .then(response => response.json())
+                    .then(lieux => {
+                        let foundLieu = null;
+                        lieux.forEach(lieu => {
+                            const distance = getDistance(lat, lng, lieu.latitude, lieu.longitude);
+                            if (distance < 0.05) { // ~50m
+                                foundLieu = lieu;
+                            }
+                        });
+
+                        if (foundLieu) {
+                            selectedLieu = foundLieu;
+                            showSelectedLieuInfo(foundLieu);
+                        } else {
+                            // Aucun lieu trouvé, proposer de créer un nouveau lieu
+                            showCreateNewLieuOption(lat, lng);
+                        }
+                    });
+            }
+
+            function showSelectedLieuInfo(lieu) {
+                const infoDiv = document.getElementById('selected-lieu-info');
+                const detailsDiv = document.getElementById('selected-lieu-details');
+
+                detailsDiv.innerHTML = `
+                    <strong>${lieu.nom}</strong><br>
+                    ${lieu.rue || 'Adresse non renseignée'}<br>
+                    ${lieu.ville} (${lieu.codePostal})
+                `;
+
+                infoDiv.style.display = 'block';
+            }
+
+            function showCreateNewLieuOption(lat, lng) {
+                const infoDiv = document.getElementById('selected-lieu-info');
+                const detailsDiv = document.getElementById('selected-lieu-details');
+
+                detailsDiv.innerHTML = `
+                    <strong>Aucun lieu trouvé à cette position</strong><br>
+                    Position: ${lat.toFixed(6)}, ${lng.toFixed(6)}<br>
+                    <small class="text-muted">Vous pouvez créer un nouveau lieu à cette position</small>
+                `;
+
+                infoDiv.style.display = 'block';
+            }
+
+            function getDistance(lat1, lng1, lat2, lng2) {
+                const R = 6371; // Rayon de la Terre en km
+                const dLat = (lat2 - lat1) * Math.PI / 180;
+                const dLng = (lng2 - lng1) * Math.PI / 180;
+                const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                    Math.sin(dLng/2) * Math.sin(dLng/2);
+                const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+                return R * c;
+            }
+
+            function reverseGeocodeNouveau(lat, lng) {
+                const formData = new FormData();
+                formData.append('lat', lat);
+                formData.append('lng', lng);
+
+                fetch('{{ path('map_reverse_geocode') }}', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.street) {
+                        document.getElementById('nouveau-lieu-adresse').value = data.street;
+                    }
+                    if (data.city) {
+                        const villeSelect = document.getElementById('nouveau-lieu-ville');
+                        for (let option of villeSelect.options) {
+                            if (option.text.includes(data.city)) {
+                                option.selected = true;
+                                break;
+                            }
+                        }
+                    }
+                })
+                .catch(error => console.error('Erreur lors du géocodage inverse:', error));
+            }
+
+            // Bouton géolocalisation
+            document.getElementById('geolocation-btn').addEventListener('click', function() {
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(function(position) {
+                        const lat = position.coords.latitude;
+                        const lng = position.coords.longitude;
+                        lieuMap.setView(lat, lng, 15);
+                    });
+                } else {
+                    alert('La géolocalisation n\'est pas supportée par ce navigateur.');
+                }
+            });
+
+            // Bouton utiliser le lieu sélectionné
+            document.getElementById('use-selected-lieu').addEventListener('click', function() {
+                if (selectedLieu) {
+                    // Sélectionner le lieu dans le formulaire
+                    const lieuSelect = document.querySelector('select[name="sortie[lieu]"]');
+                    lieuSelect.value = selectedLieu.id;
+
+                    // Revenir au mode liste
+                    document.getElementById('lieu-liste').checked = true;
+                    document.getElementById('lieu-liste-container').style.display = 'block';
+                    document.getElementById('lieu-carte-container').style.display = 'none';
+
+                    showAlert('Lieu sélectionné avec succès !', 'success');
+                }
+            });
+
+            // Bouton de géocodage pour nouveau lieu
+            document.getElementById('geocode-nouveau-btn').addEventListener('click', function() {
+                const address = document.getElementById('nouveau-lieu-adresse').value;
+                if (!address) {
+                    alert('Veuillez saisir une adresse');
+                    return;
+                }
+
+                const formData = new FormData();
+                formData.append('address', address);
+
+                fetch('{{ path('map_geocode') }}', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.lat && data.lng) {
+                        nouveauLieuMap.setSelectedLocation(data.lat, data.lng);
+                        document.getElementById('nouveau-lieu-latitude').value = data.lat.toFixed(6);
+                        document.getElementById('nouveau-lieu-longitude').value = data.lng.toFixed(6);
+                    } else {
+                        alert('Adresse non trouvée');
+                    }
+                })
+                .catch(error => {
+                    console.error('Erreur lors du géocodage:', error);
+                    alert('Erreur lors de la recherche de l\'adresse');
+                });
+            });
+
+            // Bouton de création du lieu
+            const createLieuBtn = document.getElementById('create-lieu-btn');
+            if (createLieuBtn) {
+                createLieuBtn.addEventListener('click', function() {
+                    console.log('Bouton créer lieu cliqué');
+
+                    const nom = document.getElementById('nouveau-lieu-nom').value;
+                    const adresse = document.getElementById('nouveau-lieu-adresse').value;
+                    const latitude = document.getElementById('nouveau-lieu-latitude').value;
+                    const longitude = document.getElementById('nouveau-lieu-longitude').value;
+                    const villeId = document.getElementById('nouveau-lieu-ville').value;
+
+                    console.log('Valeurs:', { nom, adresse, latitude, longitude, villeId });
+
+                    if (!nom || !latitude || !longitude || !villeId) {
+                        alert('Veuillez remplir tous les champs obligatoires');
+                        return;
+                    }
+
+                // Créer un nouveau lieu
+                const formData = new FormData();
+                formData.append('nom', nom);
+                formData.append('rue', adresse);
+                formData.append('latitude', latitude);
+                formData.append('longitude', longitude);
+                formData.append('ville', villeId);
+
+                console.log('Envoi de la requête vers:', '{{ path('sortie_map_lieu_new') }}');
+                console.log('Données envoyées:', { nom, adresse, latitude, longitude, villeId });
+
+                fetch('{{ path('sortie_map_lieu_new') }}', {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                .then(response => {
+                    console.log('Réponse reçue:', response.status, response.statusText);
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Données reçues:', data);
+                    if (data.success) {
+                        showAlert('Lieu créé avec succès !', 'success');
+
+                        // Sélectionner le nouveau lieu dans le formulaire
+                        const lieuSelect = document.querySelector('select[name="sortie[lieu]"]');
+                        const newOption = document.createElement('option');
+                        newOption.value = data.lieu.id;
+                        newOption.textContent = data.lieu.nom;
+                        lieuSelect.appendChild(newOption);
+                        lieuSelect.value = data.lieu.id;
+
+                        // Revenir au mode liste
+                        document.getElementById('lieu-liste').checked = true;
+                        document.getElementById('lieu-liste-container').style.display = 'block';
+                        document.getElementById('lieu-nouveau-container').style.display = 'none';
+
+                        // Vider les champs
+                        document.getElementById('nouveau-lieu-nom').value = '';
+                        document.getElementById('nouveau-lieu-adresse').value = '';
+                        document.getElementById('nouveau-lieu-latitude').value = '';
+                        document.getElementById('nouveau-lieu-longitude').value = '';
+                        document.getElementById('nouveau-lieu-ville').value = '';
+
+                    } else {
+                        showAlert('Erreur lors de la création du lieu: ' + (data.errors ? data.errors.join(', ') : 'Erreur inconnue'), 'danger');
+                    }
+                })
+                .catch(error => {
+                    console.error('Erreur:', error);
+                    showAlert('Erreur lors de la création du lieu', 'danger');
+                });
+            });
+            } else {
+                console.error('Bouton create-lieu-btn non trouvé');
+            }
+
+            function showAlert(message, type) {
+                const alertDiv = document.createElement('div');
+                alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
+                alertDiv.innerHTML = `
+                    ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                `;
+
+                // Insérer l'alerte en haut de la page
+                const container = document.querySelector('.container');
+                container.insertBefore(alertDiv, container.firstChild);
+
+                // Supprimer l'alerte après 5 secondes
+                setTimeout(() => {
+                    if (alertDiv.parentNode) {
+                        alertDiv.remove();
+                    }
+                }, 5000);
+            }
+        });
+    </script>
+{% endblock %}
